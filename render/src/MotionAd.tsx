@@ -2,8 +2,8 @@ import React from 'react';
 import {AbsoluteFill, Audio, Img, OffthreadVideo, Sequence, staticFile, useCurrentFrame, useVideoConfig} from 'remotion';
 import {AD, T, VIDEO, VOICE, WORDS} from './ad';
 import {EASE, QUICK, SOFT, Spring, clamp01, glide, glides, lerp, morphGlide, pulse, step} from './motion';
-import {Aura, Bokeh, Brackets, EdgeRing, Letterbox, PALETTE, RimLight, Ripple, Underline, Vignette} from './details';
-import {Variant, sfxFor} from './variants';
+import {Aura, Bokeh, Brackets, EdgeRing, Grain, Letterbox, LightLeak, PALETTE, RimLight, Ripple, Spotlight, Underline, Vignette} from './details';
+import {Variant, isCinema, sfxFor} from './variants';
 import {AD_YELLOW, Cursor, INK, Rise, WHITE, Word, fontFamily, glass} from './ui';
 
 const W = 1920;
@@ -213,8 +213,22 @@ export const MotionAd: React.FC<{variant?: Variant}> = ({variant = 'cinema'}) =>
 				</Sequence>
 			</AbsoluteFill>
 
-			{variant === 'cinema' && paused && (t < T.adStart || t >= T.contract) && <Vignette k={dim} strength={0.45} />}
-			{variant === 'cinema' && <Letterbox k={glide(t, T.freeze, 0.5) - glide(t, T.flood, 0.4) + glide(t, T.contract, 0.4) - glide(t, T.resume, 0.5)} />}
+			{isCinema(variant) && paused && (t < T.adStart || t >= T.contract) && <Vignette k={dim} strength={0.45} />}
+			{variant === 'cinema_spot' && paused && (t < T.adStart || t >= T.contract) && <Spotlight x={(VIDEO.subject.x - fx) * s + ax} y={(VIDEO.subject.y - fy) * s + ay} k={dim} />}
+			{variant === 'cinema_film' && (t < T.adStart || t >= T.contract) && (
+				<>
+					{/* warm grade as an overlay: a CSS filter on the zoomed layer would soften it */}
+					<div style={{position: 'absolute', inset: 0, background: 'rgba(255,160,80,0.16)', mixBlendMode: 'soft-light'}} />
+					<Grain t={t} k={1} />
+				</>
+			)}
+			{variant === 'cinema_leak' && (
+				<>
+					<LightLeak t={t} at={T.freeze - 0.1} />
+					<LightLeak t={t} at={T.andyou + 0.35} dur={0.9} fromLeft={false} />
+				</>
+			)}
+			{isCinema(variant) && <Letterbox size={variant === 'cinema_film' ? 150 : 110} k={glide(t, T.freeze, 0.5) - glide(t, T.flood, 0.4) + glide(t, T.contract, 0.4) - glide(t, T.resume, 0.5)} />}
 			{variant === 'bubbles' && paused && t < T.adStart && <Bokeh t={t} k={glide(t, T.ok - 0.3, 0.8)} />}
 
 			{/* Glass caption pill */}

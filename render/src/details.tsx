@@ -155,3 +155,40 @@ export const Bokeh: React.FC<{t: number; k: number}> = ({t, k}) =>
 			})}
 		</>
 	) : null;
+
+/** Film grain: fresh noise every frame (seeded by the frame, so renders are repeatable). */
+export const Grain: React.FC<{t: number; k: number; strength?: number}> = ({t, k, strength = 0.12}) =>
+	k > 0.001 ? (
+		<svg width={1920} height={1080} style={{position: 'absolute', inset: 0, opacity: strength * k, mixBlendMode: 'overlay'}}>
+			<filter id="grain">
+				<feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves={2} seed={Math.floor(t * 25)} stitchTiles="stitch" />
+				<feColorMatrix type="saturate" values="0" />
+			</filter>
+			<rect width="100%" height="100%" filter="url(#grain)" />
+		</svg>
+	) : null;
+
+/** A warm light leak in the ad's colours that sweeps across the frame. */
+export const LightLeak: React.FC<{t: number; at: number; dur?: number; fromLeft?: boolean}> = ({t, at, dur = 1.1, fromLeft = true}) => {
+	const x = (t - at) / dur;
+	if (x <= 0 || x >= 1) return null;
+	const e = EASE(x);
+	const pos = fromLeft ? -40 + 160 * e : 140 - 160 * e;
+	const a = Math.sin(Math.PI * x);
+	return (
+		<div
+			style={{
+				position: 'absolute',
+				inset: 0,
+				mixBlendMode: 'screen',
+				opacity: 0.75 * a,
+				background: `radial-gradient(ellipse 45% 90% at ${pos}% 40%, ${PALETTE.deep} 0%, rgba(248,166,112,0.6) 35%, transparent 70%), radial-gradient(ellipse 30% 60% at ${pos + 18}% 70%, ${PALETTE.lilac} 0%, transparent 70%)`,
+				filter: 'blur(20px)',
+			}}
+		/>
+	);
+};
+
+/** Darkens everything but a soft pool of light on the subject (screen position). */
+export const Spotlight: React.FC<{x: number; y: number; k: number}> = ({x, y, k}) =>
+	k > 0.001 ? <div style={{position: 'absolute', inset: 0, background: `radial-gradient(circle 520px at ${x}px ${y}px, transparent 35%, rgba(0,0,0,${0.62 * k}) 100%)`}} /> : null;
