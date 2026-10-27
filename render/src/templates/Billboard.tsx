@@ -153,7 +153,7 @@ export const Billboard: React.FC<{line?: string}> = ({line}) => {
 						{/* light spilling on the fence and the ground around the board */}
 						<div style={{position: 'absolute', left: BOARD.x - 160, top: BOARD.y - 120, width: BOARD.w + 320, height: BOARD.h + 300, background: 'radial-gradient(ellipse at 50% 40%, rgba(252,230,210,0.45), transparent 65%)', mixBlendMode: 'screen', opacity: lit * led}} />
 						<div style={{position: 'absolute', left: BOARD.x, top: BOARD.y, width: BOARD.w, height: BOARD.h, overflow: 'hidden', clipPath: `inset(0 ${(1 - lit) * 100}% 0 0)`, filter: `brightness(${flicker * lerp(0.9, 1, 1 - led)})`, outline: `${2 * led}px solid #111`}}>
-							<Img src={staticFile(t < adEnd ? 'ad/first.png' : 'ad/last.png')} style={{width: '100%', height: '100%'}} />
+							<Img src={staticFile(t < adEnd ? AD.first : AD.last)} style={{width: '100%', height: '100%'}} />
 							{/* LED pitch, gone once we are inside the board */}
 							<div style={{position: 'absolute', inset: 0, opacity: 0.35 * led, backgroundImage: 'radial-gradient(circle, transparent 0 0.55px, rgba(0,0,0,0.55) 0.75px)', backgroundSize: '2px 2px'}} />
 							<div style={{position: 'absolute', inset: 0, boxShadow: 'inset 0 0 6px rgba(0,0,0,0.5)', opacity: led}} />

@@ -19,8 +19,9 @@ import {snap, voiceSet} from './voice';
 const ZOOM_IN: Spring = {response: 0.6, damping: 0.95};
 const ZOOM_OUT: Spring = {response: 0.8, damping: 1};
 const POP: Spring = {response: 0.38, damping: 0.78};
-const SUBJECT_BOX = {x0: 930, y0: 385, x1: 1330, y1: 745};
-const BIRTH = {x: 960, y: 700};
+const SUBJECT_BOX = VIDEO.box;
+// The pill is born at the subject's hand side, on screen once the camera has zoomed in.
+const BIRTH = {x: VIDEO.anchor.x + 240, y: VIDEO.anchor.y + 140};
 const PILL = {left: 1000, cy: 400, h1: 116, h2: 176, pad: 46, font: 52, line: 62};
 const YOU_H = 62;
 const YOU_W = (AD.you.w * YOU_H) / AD.you.h;
@@ -216,8 +217,8 @@ export const Gag: React.FC<{script?: string}> = ({script = 'superman'}) => {
 			{t >= flood && r > 0.5 && (
 				<AbsoluteFill style={{background: AD.paper, maskImage: `radial-gradient(circle ${r}px at ${centre.x}px ${centre.y}px, #000 ${Math.max(0, r - feather)}px, transparent ${r}px)`}}>
 					{/* without the flying "You", the ad's first frame shows through the flood */}
-					{!youAt && t < adEnd && <Img src={staticFile('ad/first.png')} style={{position: 'absolute', width: W, height: H, opacity: glide(t, flood + 0.25, 0.4)}} />}
-					{t >= adEnd && <Img src={staticFile('ad/last.png')} style={{position: 'absolute', width: W, height: H}} />}
+					{!youAt && t < adEnd && <Img src={staticFile(AD.first)} style={{position: 'absolute', width: W, height: H, opacity: glide(t, flood + 0.25, 0.4)}} />}
+					{t >= adEnd && <Img src={staticFile(AD.last)} style={{position: 'absolute', width: W, height: H}} />}
 					{t >= adEnd && (
 						<div style={{position: 'absolute', left: back.left, top: back.top, width: back.w, height: back.h, borderRadius: back.r, background: INK, overflow: 'hidden', transform: `scale(${backIn})`, boxShadow: '0 16px 40px rgba(0,0,0,0.18)'}}>
 							<RimLight t={t} radius={back.r} colors={[PALETTE.orange, PALETTE.lilac]} />

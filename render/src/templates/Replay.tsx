@@ -16,8 +16,9 @@ import {snap, voiceSet} from './voice';
 const V = voiceSet(json);
 
 // The move, in source-frame coordinates: from his leading hand to where he will land.
-const ARC = {x0: 960, y0: 520, cx: 800, cy: 430, x1: 770, y1: 700};
-const LAND = {x: ARC.x1, y: ARC.y1};
+// Optional: drawn only when the spot knows the move's line (here measured by hand on the parkour clip).
+const ARC = VIDEO.trajectory;
+const LAND = ARC ? {x: ARC.x1, y: ARC.y1} : VIDEO.subject;
 const ZOOM = 1.35;
 
 const SRC0 = VIDEO.freezeAt - 1.3;
@@ -129,7 +130,7 @@ export const Replay: React.FC = () => {
 	const r = radius(t);
 	const feather = Math.max(1.5, Math.abs(r - radius(t - 1 / 50)));
 
-	const d = `M${ARC.x0} ${ARC.y0} Q${ARC.cx} ${ARC.cy} ${ARC.x1} ${ARC.y1}`;
+	const d = ARC ? `M${ARC.x0} ${ARC.y0} Q${ARC.cx} ${ARC.cy} ${ARC.x1} ${ARC.y1}` : '';
 	return (
 		<AbsoluteFill style={{background: INK, overflow: 'hidden'}}>
 			<AbsoluteFill style={{transformOrigin: '0 0', transform: `translate(${W / 2 - fx * sc}px, ${H / 2 - fy * sc}px) scale(${sc})`}}>
@@ -141,7 +142,7 @@ export const Replay: React.FC = () => {
 					</Sequence>
 				)}
 				{/* telestrator: the jump's line and where he lands */}
-				{draw > 0 && t < adStart && (
+				{ARC && draw > 0 && t < adStart && (
 					<svg width={W} height={H} style={{position: 'absolute', inset: 0, overflow: 'visible', opacity: 1 - lineOut}}>
 						<mask id="drawn">
 							<path d={d} pathLength={1} fill="none" stroke="#fff" strokeWidth={14 / sc} strokeDasharray={1} strokeDashoffset={1 - draw} />
@@ -162,7 +163,7 @@ export const Replay: React.FC = () => {
 
 			{t >= flood && r > 0.5 && (
 				<AbsoluteFill style={{background: AD.paper, maskImage: `radial-gradient(circle ${r}px at ${land.x}px ${land.y}px, #000 ${Math.max(0, r - feather)}px, transparent ${r}px)`}}>
-					<Img src={staticFile(t < adEnd ? 'ad/first.png' : 'ad/last.png')} style={{position: 'absolute', width: W, height: H}} />
+					<Img src={staticFile(t < adEnd ? AD.first : AD.last)} style={{position: 'absolute', width: W, height: H}} />
 					{t >= adEnd && <Slate t={t} k={backK} words={W_.back} out={contract} />}
 				</AbsoluteFill>
 			)}

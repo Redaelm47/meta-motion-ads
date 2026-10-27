@@ -4,7 +4,8 @@
     python3 tools/render.py out/motion-ad.mp4        # full size, 50 fps, 8-subframe motion blur on the bridges
     python3 tools/render.py out/replay.mp4 --draft --comp=Replay --preview
         --comp: which bridge template (src/templates/catalog.ts); --preview: only the ad's first and
-        last 2.5 s, to judge the bridges quickly; --voice=<dir>: another take of the gag's lines
+        last 2.5 s, to judge the bridges quickly; --voice=<dir>: another take of the gag's lines;
+        --spot=<name>: another video and ad (public/spots/<name>, made by pipeline/tools/make_spot.py)
 
 The middle of the film is the brand's ad, untouched: ffmpeg copies it in and draws the yellow
 ad progress bar, which is real time instead of a browser screenshot per frame. Audio: our
@@ -33,16 +34,29 @@ def main():
     preview = "--preview" in sys.argv
     comp = next((a.split("=", 1)[1] for a in sys.argv if a.startswith("--comp=")), "MotionAd")
     voice = next((Path(a.split("=", 1)[1]).resolve() for a in sys.argv if a.startswith("--voice=")), None)
-    if voice:  # the gag's timeline is built from public/bridge: swap another take in for this render
-        bridge, backup = ROOT / "public" / "bridge", ROOT / "public" / "bridge-backup"
-        shutil.move(bridge, backup)
-        shutil.copytree(voice, bridge, ignore=shutil.ignore_patterns("preview.wav"))
-        try:
-            return render(args, draft, preview, comp)
-        finally:
-            shutil.rmtree(bridge)
-            shutil.move(backup, bridge)
-    render(args, draft, preview, comp)
+    spot = next((a.split("=", 1)[1] for a in sys.argv if a.startswith("--spot=")), None)
+    # Swapped in for this render only, put back afterwards: another take of the gag's lines
+    # (public/bridge), another spot (src/spot.json: another video and ad).
+    swaps = []
+    if voice:
+        swaps.append((voice, ROOT / "public" / "bridge"))
+    if spot:
+        swaps.append((ROOT / "public" / "spots" / spot / "spot.json", ROOT / "src" / "spot.json"))
+    done = []
+    try:
+        for src, dst in swaps:
+            backup = dst.with_name(dst.name + ".backup")
+            shutil.move(dst, backup)
+            done.append((dst, backup))
+            if src.is_dir():
+                shutil.copytree(src, dst, ignore=shutil.ignore_patterns("preview.wav"))
+            else:
+                shutil.copy(src, dst)
+        render(args, draft, preview, comp)
+    finally:
+        for dst, backup in done:
+            shutil.rmtree(dst) if dst.is_dir() else dst.unlink()
+            shutil.move(backup, dst)
 
 
 def render(args, draft, preview, comp):

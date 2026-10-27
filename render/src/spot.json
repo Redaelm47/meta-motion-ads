@@ -1,0 +1,18 @@
+{
+ "name": "parkour-base44",
+ "video": {
+  "clip": "demo/clip.mp4", "leadInClip": "demo/leadin.mp4", "freeze": "demo/freeze.png", "person": "demo/person.png",
+  "leadIn": 2.0, "freezeAt": 2.933333, "end": 5.6, "leadInRate": 0.75,
+  "subject": {"x": 1140, "y": 540}, "anchor": {"x": 720, "y": 560}, "zoom": 1.6,
+  "box": {"x0": 930, "y0": 385, "x1": 1330, "y1": 745}, "head": {"x": 1014, "y": 450},
+  "frames": {"dir": "demo/frames", "freezeIndex": 146, "count": 195},
+  "trajectory": {"x0": 960, "y0": 520, "cx": 800, "cy": 430, "x1": 770, "y1": 700}
+ },
+ "ad": {
+  "video": "ad/base44.mp4", "audio": "ad/base44_full.wav", "duration": 56.4, "brand": "Base44", "site": "base44.com",
+  "paper": "#fcf9f6", "letterInk": "#343434", "first": "ad/first.png", "last": "ad/last.png",
+  "you": {"letters": "ad/you_letters.png", "sun": "ad/you_sun.png", "x": 710, "y": 425, "w": 448, "h": 219}
+ },
+ "scripts": {},
+ "voices": {}
+}

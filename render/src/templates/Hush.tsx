@@ -87,8 +87,8 @@ export const Hush: React.FC = () => {
 				)}
 			</AbsoluteFill>
 			{toPaper > 0.001 && <AbsoluteFill style={{background: AD.paper, opacity: toPaper}} />}
-			{t > melt + 0.9 && t < adStart && <Img src={staticFile('ad/first.png')} style={{position: 'absolute', width: W, height: H, opacity: adFocus, filter: `blur(${(1 - adFocus) * 28}px)`}} />}
-			{t >= adEnd && adOut < 1 && <Img src={staticFile('ad/last.png')} style={{position: 'absolute', width: W, height: H, opacity: 1 - adOut, filter: `blur(${adOut * 28}px)`}} />}
+			{t > melt + 0.9 && t < adStart && <Img src={staticFile(AD.first)} style={{position: 'absolute', width: W, height: H, opacity: adFocus, filter: `blur(${(1 - adFocus) * 28}px)`}} />}
+			{t >= adEnd && adOut < 1 && <Img src={staticFile(AD.last)} style={{position: 'absolute', width: W, height: H, opacity: 1 - adOut, filter: `blur(${adOut * 28}px)`}} />}
 
 			{/* a soft shade under the caption, so it reads on a bright wall */}
 			<AbsoluteFill style={{background: 'linear-gradient(180deg, transparent 55%, rgba(0,0,0,0.38) 100%)', opacity: glide(t, caption - 0.3, 1) * (1 - glide(t, melt - 0.2, 0.8)) + glide(t, welcome - 0.3, 1) * (1 - glide(t, rise + 0.3, 0.8))}} />

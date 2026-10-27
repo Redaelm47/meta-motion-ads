@@ -29,6 +29,7 @@ def main():
     ap.add_argument("--cfg", type=float, default=0.4)
     ap.add_argument("--seed", type=int, default=1)
     ap.add_argument("--set", default="bridge", choices=sorted(SETS))
+    ap.add_argument("--lines", help='JSON list of [key, text], instead of a --set (used by make_spot.py)')
     args = ap.parse_args()
 
     torch.set_num_threads(4)
@@ -38,7 +39,9 @@ def main():
     out.mkdir(parents=True, exist_ok=True)
 
     table, preview = [], []
-    for key, text in SETS[args.set]:
+    chunks = json.loads(args.lines) if args.lines else SETS[args.set]
+    public = Path(__file__).resolve().parent.parent / "render" / "public"
+    for key, text in chunks:
         torch.manual_seed(args.seed)
         wav = model.generate(text, exaggeration=args.exaggeration, cfg_weight=args.cfg).squeeze(0).cpu().numpy()
         audio, _ = trim(wav.astype(np.float32), pad=0.04)
@@ -50,7 +53,7 @@ def main():
         for w in words:
             timed.append({"w": w, "start": round(dur * acc / total, 3), "end": round(dur * (acc + len(w)) / total, 3)})
             acc += len(w)
-        table.append({"key": key, "text": text, "file": f"bridge/{key}.wav" if args.set == "bridge" else f"voice/{args.set}/{key}.wav", "duration": round(dur, 3), "words": timed})
+        table.append({"key": key, "text": text, "file": str((out / f"{key}.wav").resolve().relative_to(public)) if args.lines else f"bridge/{key}.wav" if args.set == "bridge" else f"voice/{args.set}/{key}.wav", "duration": round(dur, 3), "words": timed})
         preview += [audio, np.zeros(int(PAUSES.get(key, 0.4) * model.sr), np.float32)]
         print(f"{key}: {dur:.2f}s", flush=True)
 

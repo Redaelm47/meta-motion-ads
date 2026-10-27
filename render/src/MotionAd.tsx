@@ -253,7 +253,7 @@ export const MotionAd: React.FC<{variant?: Variant}> = ({variant = 'cinema'}) =>
 							<OffthreadVideo src={staticFile(AD.video)} muted style={{width: W, height: H}} />
 						</Sequence>
 					)}
-					{t >= T.adEnd && <Img src={staticFile('ad/last.png')} style={{position: 'absolute', width: W, height: H}} />}
+					{t >= T.adEnd && <Img src={staticFile(AD.last)} style={{position: 'absolute', width: W, height: H}} />}
 					{t >= T.adEnd && (
 						<div style={{position: 'absolute', left: back.left, top: back.top, width: back.w, height: back.h, borderRadius: back.r, background: INK, overflow: 'hidden', transform: `scale(${backIn})`, boxShadow: '0 16px 40px rgba(0,0,0,0.18)'}}>
 							<RimLight t={t} radius={back.r} colors={[PALETTE.orange, PALETTE.lilac]} />

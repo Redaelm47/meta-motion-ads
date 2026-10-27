@@ -77,12 +77,12 @@ export const AdBar: React.FC<{k: number; progress: number; left?: number; width?
 
 // Source frames around the frozen moment, 60 fps interpolated (tools/frames.sh): any source time
 // can be shown, so a template can ramp speed, rewind or replay in slow motion.
-const FRAMES = {fps: 60, freezeIndex: 146, count: 153};
+const FRAMES = {fps: 60, ...VIDEO.frames};
 export const SOURCE_FIRST = VIDEO.freezeAt - FRAMES.freezeIndex / FRAMES.fps;
 
 export const SourceFrame: React.FC<{s: number; style?: React.CSSProperties}> = ({s, style}) => {
 	const i = Math.max(0, Math.min(FRAMES.count - 1, FRAMES.freezeIndex + Math.round((s - VIDEO.freezeAt) * FRAMES.fps)));
-	return <Img src={staticFile(`demo/frames/f${String(i).padStart(3, '0')}.jpg`)} style={{position: 'absolute', width: W, height: H, ...style}} />;
+	return <Img src={staticFile(`${FRAMES.dir}/f${String(i).padStart(3, '0')}.jpg`)} style={{position: 'absolute', width: W, height: H, ...style}} />;
 };
 
 /** A speed ramp from rate `r0` to `r1` over [t0, t0 + d]: source seconds elapsed since t0. */

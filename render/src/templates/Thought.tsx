@@ -166,7 +166,7 @@ export const Thought: React.FC = () => {
 
 			{t >= flood && r > 0.5 && (
 				<AbsoluteFill style={{background: AD.paper, maskImage: `radial-gradient(circle ${r}px at ${centre.x}px ${centre.y}px, #000 ${Math.max(0, r - feather)}px, transparent ${r}px)`}}>
-					<Img src={staticFile(t < adEnd ? 'ad/first.png' : 'ad/last.png')} style={{position: 'absolute', width: W, height: H, opacity: t < adEnd ? glide(t, flood + 0.25, 0.4) : 1}} />
+					<Img src={staticFile(t < adEnd ? AD.first : AD.last)} style={{position: 'absolute', width: W, height: H, opacity: t < adEnd ? glide(t, flood + 0.25, 0.4) : 1}} />
 					{t >= adEnd && (
 						<>
 							{[{x: 830, y: 712, r: 9, d: 0.2}, {x: 870, y: 682, r: 14, d: 0.1}].map((p, i) => {

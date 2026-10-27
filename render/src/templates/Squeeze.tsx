@@ -61,7 +61,7 @@ export const Squeeze: React.FC = () => {
 			{/* The ad's card */}
 			{adIn > 0.001 && (
 				<div style={{position: 'absolute', left: adX, top: AD_CARD.y, width: AD_CARD.w, height: AD_CARD.h, borderRadius: AD_CARD.r, overflow: 'hidden', background: AD.paper, boxShadow: '0 30px 80px rgba(52,40,30,0.18), 0 6px 18px rgba(52,40,30,0.10)'}}>
-					{!inAd && <Img src={staticFile(t < adStart ? 'ad/first.png' : 'ad/last.png')} style={{width: '100%', height: '100%'}} />}
+					{!inAd && <Img src={staticFile(t < adStart ? AD.first : AD.last)} style={{width: '100%', height: '100%'}} />}
 				</div>
 			)}
 			<div style={{position: 'absolute', left: AD_CARD.x + 4, top: AD_CARD.y - 46, fontFamily, fontSize: 24, fontWeight: 500, letterSpacing: '-0.01em', color: '#8a7f78', opacity: labels, transform: `translateY(${(1 - labels) * 8}px)`}}>

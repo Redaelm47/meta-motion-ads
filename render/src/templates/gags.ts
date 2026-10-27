@@ -7,6 +7,7 @@ import cartoon from '../../public/voice/cartoon/lines.json';
 import nature from '../../public/voice/nature/lines.json';
 import scratch from '../../public/voice/scratch/lines.json';
 import superman from '../../public/voice/superman/lines.json';
+import {SPOT} from '../ad';
 
 type Chunk = [key: string, gapAfter: number];
 export type GagScript = {voice: {lines: {key: string; text: string; file: string; duration: number; words: {w: string; start: number; end: number}[]}[]}; pills: Chunk[][]; you: boolean; out: Chunk[]; source: string};
@@ -23,3 +24,10 @@ export const GAGS: Record<string, GagScript> = {
 	// Nature documentary narrator, calm voice; specific, then deflated. Works with any ad.
 	nature: {voice: nature, pills: [[['leaps', 0.05], ['boss', 0.7]], [['wall', 0.6]]], you: false, out: [['resumes', 0.35]], source: 'Nature documentary narration parodies (docs/references-humour.md, #7 and G11)'},
 };
+
+// A spot (another video and ad, pipeline/tools/make_spot.py) can bring its own gag: Gag-spot.
+type SpotScripts = {gag?: Omit<GagScript, 'voice'> & {voice: string}; thought?: {voice: string; bubbles: Chunk[][]; out: Chunk[]}};
+const own = SPOT.scripts as SpotScripts;
+const voices = SPOT.voices as Record<string, GagScript['voice']>;
+if (own.gag) GAGS.spot = {...own.gag, voice: voices[own.gag.voice]};
+export const SPOT_THOUGHT = own.thought ? {...own.thought, voice: voices[own.thought.voice]} : null;

@@ -3,33 +3,15 @@
 // finds the hook (this ad opens on the word "You"), SAM 3.1 cuts out the subject.
 
 import bridge from '../public/bridge/lines.json';
+import spot from './spot.json';
 import type {Word} from './ui';
 
-export const VIDEO = {
-	clip: 'demo/clip.mp4',
-	leadInClip: 'demo/leadin.mp4', // 0.75x slow motion with interpolated frames
-	freeze: 'demo/freeze.png',
-	person: 'demo/person.png',
-	leadIn: 2.0,
-	freezeAt: 88 / 30,
-	end: 5.6,
-	leadInRate: 0.75,
-	subject: {x: 1140, y: 540},
-	anchor: {x: 720, y: 560},
-	zoom: 1.6,
-};
-
-export const AD = {
-	video: 'ad/base44.mp4',
-	audio: 'ad/base44_full.wav', // the ad's own sound, music included (it's their ad, not ours)
-	duration: 1410 / 25,
-	brand: 'Base44',
-	site: 'base44.com',
-	paper: '#fcf9f6', // background of the ad's first and last frames
-	letterInk: '#343434',
-	// The ad opens on "You": its own artwork, cut out of the first frame, lands exactly there.
-	you: {letters: 'ad/you_letters.png', sun: 'ad/you_sun.png', x: 710, y: 425, w: 448, h: 219},
-};
+// The video and the ad come from the current spot (src/spot.json, swapped in by tools/render.py
+// --spot=<name>; spots are made by pipeline/tools/make_spot.py). Default: parkour clip + Base44.
+type Spot = typeof spot & {video: {trajectory?: {x0: number; y0: number; cx: number; cy: number; x1: number; y1: number}}; ad: {you?: typeof spot.ad.you | null}};
+export const SPOT = spot as Spot;
+export const VIDEO = SPOT.video;
+export const AD = SPOT.ad as typeof spot.ad;
 
 type Line = {key: string; text: string; file: string; duration: number; words: Word[]};
 const LINES = Object.fromEntries((bridge.lines as Line[]).map((l) => [l.key, l])) as Record<string, Line>;

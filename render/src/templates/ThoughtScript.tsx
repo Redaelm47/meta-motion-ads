@@ -17,12 +17,16 @@ const POP: Spring = {response: 0.38, damping: 0.78};
 const ZOOM_IN: Spring = {response: 0.6, damping: 0.95};
 const ZOOM_OUT: Spring = {response: 0.8, damping: 1};
 const PUFF_AT = [0.45, 0.6, 0.75];
+// Puffs and bubble rise from the head, measured on screen once the camera has zoomed in (offsets
+// tuned on the parkour clip, the bubble kept inside the frame).
+const HEAD = {x: VIDEO.anchor.x + (VIDEO.head.x - VIDEO.subject.x) * VIDEO.zoom, y: VIDEO.anchor.y + (VIDEO.head.y - VIDEO.subject.y) * VIDEO.zoom};
+const LIFT = Math.min(206, HEAD.y - 150); // how far above the head the bubble sits
 const PUFFS = [
-	{x: 636, y: 306, r: 11},
-	{x: 690, y: 258, r: 17},
-	{x: 762, y: 210, r: 25},
+	{x: HEAD.x + 118, y: HEAD.y - LIFT * 0.53, r: 11},
+	{x: HEAD.x + 172, y: HEAD.y - LIFT * 0.77, r: 17},
+	{x: HEAD.x + 244, y: HEAD.y - LIFT, r: 25},
 ];
-const BUB = {left: 810, cy: 210, h1: 116, h2: 176, font: 50, line: 60, pad: 50};
+const BUB = {left: HEAD.x + 292, cy: HEAD.y - LIFT, h1: 116, h2: 176, font: 50, line: 60, pad: 50};
 const BACK = {left: 840, cy: 640, h: 96, font: 42, pad: 44};
 const bubW = (s: string) => textWidth(s, BUB.font, -0.03);
 const backW = (s: string) => textWidth(s, BACK.font, -0.02);
@@ -186,7 +190,7 @@ export const ThoughtScripted: React.FC<{script: string}> = ({script}) => {
 
 			{t >= flood && r > 0.5 && (
 				<AbsoluteFill style={{background: AD.paper, maskImage: `radial-gradient(circle ${r}px at ${centre.x}px ${centre.y}px, #000 ${Math.max(0, r - feather)}px, transparent ${r}px)`}}>
-					<Img src={staticFile(t < adEnd ? 'ad/first.png' : 'ad/last.png')} style={{position: 'absolute', width: W, height: H, opacity: t < adEnd ? glide(t, flood + 0.25, 0.4) : 1}} />
+					<Img src={staticFile(t < adEnd ? AD.first : AD.last)} style={{position: 'absolute', width: W, height: H, opacity: t < adEnd ? glide(t, flood + 0.25, 0.4) : 1}} />
 					{t >= adEnd && (
 						<>
 							{[{x: BACK.left - 10, y: BACK.cy + 72, r: 9, d: 0.2}, {x: BACK.left + 30, y: BACK.cy + 42, r: 14, d: 0.1}].map((p, i) => {

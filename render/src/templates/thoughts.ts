@@ -3,7 +3,7 @@
 
 import land from '../../public/voice/thought_land/lines.json';
 import plan from '../../public/voice/thought_plan/lines.json';
-import type {GagScript} from './gags';
+import {GagScript, SPOT_THOUGHT} from './gags';
 
 type Chunk = [key: string, gapAfter: number];
 export type ThoughtScript = {voice: GagScript['voice']; bubbles: Chunk[][]; out: Chunk[]};
@@ -14,3 +14,4 @@ export const THOUGHTS: Record<string, ThoughtScript> = {
 	// "Mid-air. No plan. If only there was an app for this..." / "Okay. Plan B: jump."
 	plan: {voice: plan, bubbles: [[['midair', 0.25]], [['noplan', 0.35]], [['ifonly', 0.05], ['appfor', 0.5]]], out: [['okay', 0.25], ['planb', 0.3]]},
 };
+if (SPOT_THOUGHT) THOUGHTS.spot = SPOT_THOUGHT;
