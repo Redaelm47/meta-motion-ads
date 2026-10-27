@@ -16,7 +16,6 @@ from pathlib import Path
 
 CHROME = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
 ROOT = Path(__file__).resolve().parent.parent
-PARTS = ROOT / "out" / "parts"
 
 
 def run(cmd, **kw):
@@ -30,6 +29,7 @@ def main():
     final = Path(args[0] if args else ("out/draft.mp4" if draft else "out/motion-ad.mp4"))
     fps, sub, scale = (25, 1, 0.5) if draft else (50, 8, 1.0)
     w, h = int(1920 * scale), int(1080 * scale)
+    PARTS = ROOT / "out" / f"parts-{final.stem}"  # one folder per output, so two renders never share parts
 
     tl = json.loads(run(["npx", "tsx", "tools/timings.ts"], capture_output=True, text=True).stdout)
     a = round(tl["adStart"] * fps)  # output frames [0, a): intro bridge
@@ -41,6 +41,15 @@ def main():
         p.unlink()
 
     def bridge(name, first, last):
+        for attempt in range(2):  # headless Chrome occasionally drops a frame under load; one retry
+            try:
+                return render_part(name, first, last)
+            except subprocess.CalledProcessError:
+                if attempt:
+                    raise
+                print("retrying", name, flush=True)
+
+    def render_part(name, first, last):
         run(["npx", "remotion", "render", "src/index.ts", "MotionAd", PARTS / f"{name}.mp4",
              f"--props={json.dumps({'fps': fps * sub})}", f"--frames={first * sub}-{last * sub - 1}",
              f"--scale={scale}", "--concurrency=8", "--crf=18", "--log=error", f"--browser-executable={CHROME}"])
@@ -71,6 +80,7 @@ def main():
          "-c:a", "aac", "-b:a", "192k", "-ar", "48000", final])
     for p in PARTS.iterdir():
         p.unlink()
+    PARTS.rmdir()
     print("done:", final)
 
 

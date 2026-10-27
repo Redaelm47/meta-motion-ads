@@ -47,25 +47,26 @@ const end = (k: string, start: number) => start + LINES[k].duration;
 const FPS = 50;
 const snap = (x: number) => Math.round(x * FPS) / FPS; // cut points sit on whole output frames
 
+// Natural delivery: one chunk per breath, with the silences placed here. About 0.3-0.4 s between
+// sentences, longer beats (0.6-0.8 s) where the joke needs to land.
 const freeze = (VIDEO.freezeAt - VIDEO.leadIn) / VIDEO.leadInRate;
-const gag1 = freeze + 0.3;
-const gag2 = end('gag1', gag1) + 0.15;
-const flood = end('gag2', gag2) + 0.05;
+const ok = freeze + 0.6; // let the frozen jump sink in first
+const motivated = end('ok', ok) + 0.35;
+const isnthe = end('motivated', motivated) + 0.22;
+const andyou = end('isnthe', isnthe) + 0.6; // the beat
+const flood = end('andyou', andyou) + 0.08;
 const adStart = snap(flood + 0.7);
 const adEnd = adStart + AD.duration;
-const back = adEnd + 0.12;
-const contract = end('back', back) + 0.2;
-const settle = contract + 0.5; // back on the paused video: the camera eases out before it plays again
-const playPress = settle + 0.75;
+const alright = adEnd + 0.5; // stay on the ad's last line for a moment
+const where = end('alright', alright) + 0.3;
+const contract = end('where', where) + 0.35;
+const settle = contract + 0.45; // back on the paused video: the camera eases out before it plays again
+const playPress = settle + 0.6;
 const resume = playPress + 0.12;
 
-export const T = {press: 1.12, freeze, gag1, gag2, flood, land: flood + 0.64, adStart, adEnd, back, contract, settle, playPress, resume};
-export const VOICE = [
-	{t: gag1, line: LINES.gag1},
-	{t: gag2, line: LINES.gag2},
-	{t: back, line: LINES.back},
-];
-export const WORDS = {gag1: timed('gag1', gag1), gag2: timed('gag2', gag2), back: timed('back', back)};
+export const T = {press: 1.12, freeze, ok, motivated, isnthe, andyou, flood, land: flood + 0.64, adStart, adEnd, alright, where, contract, settle, playPress, resume};
+export const VOICE = (['ok', 'motivated', 'isnthe', 'andyou', 'alright', 'where'] as const).map((k) => ({t: T[k], line: LINES[k]}));
+export const WORDS = Object.fromEntries(VOICE.map((v) => [v.line.key, timed(v.line.key, v.t)])) as Record<'ok' | 'motivated' | 'isnthe' | 'andyou' | 'alright' | 'where', Word[]>;
 export const TOTAL = resume + (VIDEO.end - VIDEO.freezeAt) + 0.4;
 /** Parts that move fast enough to need motion blur (rendered with subframes). */
 export const BLUR_RANGES: [number, number][] = [

@@ -15,3 +15,4 @@ render/out/
 render/public/sfx/mixkit-*
 # Third-party ads used for development only (not ours to redistribute)
 render/public/ad/
+.venv-cb/

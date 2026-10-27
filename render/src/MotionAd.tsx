@@ -2,7 +2,8 @@ import React from 'react';
 import {AbsoluteFill, Audio, Img, OffthreadVideo, Sequence, staticFile, useCurrentFrame, useVideoConfig} from 'remotion';
 import {AD, T, VIDEO, VOICE, WORDS} from './ad';
 import {EASE, QUICK, SOFT, Spring, clamp01, glide, glides, lerp, morphGlide, pulse, step} from './motion';
-import {AD_YELLOW, Cursor, INK, Rise, WHITE, Word, fontFamily, glass} from './ui';
+import {Brackets, Callout, EdgeRing, OrbitHalf, RimLight, Ripple, Underline} from './details';
+import {AD_YELLOW, Cursor, INK, LIME, Rise, WHITE, Word, fontFamily, glass} from './ui';
 
 const W = 1920;
 const H = 1080;
@@ -14,7 +15,11 @@ const YT_RED = '#ff0033';
 
 const PLAY_BTN = {x: 62, y: 1046}; // the player's play / pause button
 const BIRTH = {x: 960, y: 700}; // the subject's hand on screen, where the caption pill is born
-const PILL = {left: 1040, cy: 400, w1: 640, h1: 176, w2: 380, h2: 116, pad: 46, font: 52};
+// Subject in source-frame coordinates: lock-on box, orbit around the body, head for the callout.
+const SUBJECT_BOX = {x0: 890, y0: 385, x1: 1330, y1: 750};
+const ORBIT = {cx: 1111, cy: 600, rx: 250, ry: 62, rot: -10};
+const HEAD = {x: 995, y: 455};
+const PILL = {left: 1040, cy: 400, wOk: 250, w1: 650, h1: 116, h2: 176, wYou: 380, h: 116, pad: 46, font: 52, line: 62};
 // "You" inside the pill: the ad's own artwork, at text size.
 const YOU_H = 62;
 const YOU_W = (AD.you.w * YOU_H) / AD.you.h;
@@ -41,25 +46,29 @@ const sourceSeconds = (t: number) => {
 const SFX: {t: number; src: string; volume: number}[] = [
 	{t: T.press, src: 'kenney-click_002.ogg', volume: 0.2},
 	{t: T.freeze, src: 'mixkit-166.mp3', volume: 0.2},
-	{t: T.gag1 - 0.3, src: 'mixkit-2577.mp3', volume: 0.3},
-	{t: T.gag2 - 0.1, src: 'mixkit-3115.mp3', volume: 0.18},
+	{t: T.ok - 0.3, src: 'mixkit-2577.mp3', volume: 0.3},
+	{t: T.motivated - 0.12, src: 'mixkit-3115.mp3', volume: 0.14},
+	{t: T.andyou - 0.1, src: 'mixkit-3115.mp3', volume: 0.18},
 	{t: T.flood, src: 'mixkit-166.mp3', volume: 0.2},
 	{t: T.land - 0.05, src: 'kenney-impactWood_light_000.ogg', volume: 0.34},
-	{t: T.back - 0.08, src: 'mixkit-2577.mp3', volume: 0.3},
+	{t: T.alright - 0.08, src: 'mixkit-2577.mp3', volume: 0.3},
 	{t: T.contract, src: 'mixkit-166.mp3', volume: 0.2},
 	{t: T.settle, src: 'mixkit-3115.mp3', volume: 0.12},
 	{t: T.playPress, src: 'kenney-click_002.ogg', volume: 0.2},
 ];
 
-const Lines: React.FC<{t: number; lines: Word[][]; out?: number}> = ({t, lines, out}) => (
+const Lines: React.FC<{t: number; lines: Word[][]; out?: number; deco?: (w: Word) => React.ReactNode}> = ({t, lines, out, deco}) => (
 	<div style={{textAlign: 'center', whiteSpace: 'pre'}}>
 		{lines.map((ws, li) => (
 			<div key={li}>
 				{ws.map((w, i) => (
 					<React.Fragment key={i}>
-						<Rise t={t} at={w.start - 0.06} out={out === undefined ? undefined : out + (li * 3 + i) * 0.025}>
-							{w.w}
-						</Rise>
+						<span style={{position: 'relative', display: 'inline-block'}}>
+							<Rise t={t} at={w.start - 0.06} out={out === undefined ? undefined : out + (li * 3 + i) * 0.025}>
+								{w.w}
+							</Rise>
+							{deco?.(w)}
+						</span>
 						{i < ws.length - 1 ? ' ' : null}
 					</React.Fragment>
 				))}
@@ -134,20 +143,23 @@ export const MotionAd: React.FC = () => {
 
 	// Caption pill, born at the subject's hand.
 	const pill = morphGlide(t, [
-		{t: T.gag1 - 0.3, cx: BIRTH.x, cy: BIRTH.y, w: 30, h: 30, r: 15},
-		{t: T.gag1 - 0.25, cx: PILL.left + PILL.w1 / 2, cy: PILL.cy, w: PILL.w1, h: PILL.h1, r: 48},
-		{t: T.gag2 - 0.1, cx: PILL.left + PILL.w2 / 2, cy: PILL.cy, w: PILL.w2, h: PILL.h2, r: PILL.h2 / 2},
+		{t: T.ok - 0.3, cx: BIRTH.x, cy: BIRTH.y, w: 30, h: 30, r: 15},
+		{t: T.ok - 0.25, cx: PILL.left + PILL.wOk / 2, cy: PILL.cy, w: PILL.wOk, h: PILL.h, r: PILL.h / 2},
+		{t: T.motivated - 0.12, cx: PILL.left + PILL.w1 / 2, cy: PILL.cy, w: PILL.w1, h: PILL.h1, r: PILL.h / 2},
+		{t: T.isnthe - 0.1, cx: PILL.left + PILL.w1 / 2, cy: PILL.cy, w: PILL.w1, h: PILL.h2, r: 48},
+		{t: T.andyou - 0.1, cx: PILL.left + PILL.wYou / 2, cy: PILL.cy, w: PILL.wYou, h: PILL.h, r: PILL.h / 2},
 	], 0.42, 0.6);
-	const pillIn = step(t - (T.gag1 - 0.3), POP);
+	const pillIn = step(t - (T.ok - 0.3), POP);
+	const twoLines = glide(t, T.isnthe - 0.1, 0.6);
 
 	// The ad's own "You" flies from the pill to where the ad's first frame has it.
-	const youAt = WORDS.gag2[1].start - 0.06;
+	const youAt = WORDS.andyou[1].start - 0.06;
 	const fly = glide(t, T.flood + 0.02, 0.62);
 	const you = {x: lerp(YOU_IN.x, AD.you.x, fly), y: lerp(YOU_IN.y, AD.you.y, fly), w: lerp(YOU_W, AD.you.w, fly), h: lerp(YOU_H, AD.you.h, fly)};
 	const youPop = step(t - youAt, POP);
 
 	// Paper floods out of the pill, the ad plays on it, then it closes into the play button.
-	const pillCx = PILL.left + PILL.w2 / 2;
+	const pillCx = PILL.left + PILL.wYou / 2;
 	const radius = (tt: number) => {
 		const ck = EASE(clamp01((tt - T.contract) / 0.5));
 		return ck > 0 ? Math.sqrt(1 - ck) * far(PLAY_BTN.x, PLAY_BTN.y) : Math.sqrt(EASE(clamp01((tt - T.flood) / 0.5))) * far(pillCx, PILL.cy);
@@ -177,7 +189,13 @@ export const MotionAd: React.FC = () => {
 	const cx = glides(t, keys.map((c) => ({t: c.t, v: c.x, d: 0.8})));
 	const cy = glides(t, keys.map((c) => ({t: c.t, v: c.y, d: 0.8})));
 	const press = pulse(t, T.press, T.press + 0.12, QUICK) + pulse(t, T.playPress, T.playPress + 0.12, QUICK);
-	const backIn = step(t - (T.back - 0.08), POP);
+	// Reply pill on the ad's last frame: "Alright." then it widens for "Where were we?".
+	const back = morphGlide(t, [
+		{t: T.alright - 0.12, cx: 960, cy: 662, w: 30, h: 30, r: 15},
+		{t: T.alright - 0.08, cx: 960, cy: 662, w: 230, h: 92, r: 46},
+		{t: T.where - 0.12, cx: 960, cy: 662, w: 560, h: 92, r: 46},
+	], 0.42, 0.6);
+	const backIn = step(t - (T.alright - 0.12), POP);
 
 	return (
 		<AbsoluteFill style={{backgroundColor: INK, overflow: 'hidden'}}>
@@ -189,6 +207,7 @@ export const MotionAd: React.FC = () => {
 				{paused && (
 					<>
 						<Img src={staticFile(VIDEO.freeze)} style={{position: 'absolute', width: W, height: H, filter: `brightness(${1 - 0.42 * dim}) saturate(${1 - 0.3 * dim}) blur(${4 * dim}px)`}} />
+						<OrbitHalf t={t} orbit={ORBIT} half="back" at={T.ok - 0.15} out={T.flood} scale={s} />
 						<Img
 							src={staticFile(VIDEO.person)}
 							style={{
@@ -200,6 +219,8 @@ export const MotionAd: React.FC = () => {
 								filter: `drop-shadow(0 ${18 * dim}px ${26 * dim}px rgba(0,0,0,${0.45 * dim}))`,
 							}}
 						/>
+						<OrbitHalf t={t} orbit={ORBIT} half="front" at={T.ok - 0.15} out={T.flood} scale={s} />
+						<Brackets t={t} box={SUBJECT_BOX} at={T.freeze + 0.12} out={T.ok - 0.1} scale={s} />
 					</>
 				)}
 				<Sequence from={Math.round(T.resume * fps)}>
@@ -207,14 +228,22 @@ export const MotionAd: React.FC = () => {
 				</Sequence>
 			</AbsoluteFill>
 
+			<Callout t={t} from={{x: (HEAD.x - fx) * s + ax, y: (HEAD.y - fy) * s + ay}} to={{x: pill.left + 4, y: pill.top + pill.h / 2}} at={T.ok - 0.05} out={T.andyou - 0.15} />
+
 			{/* Glass caption pill */}
-			{paused && t > T.gag1 - 0.3 && t < T.adStart && (
+			{paused && t > T.ok - 0.3 && t < T.adStart && (
 				<div style={{position: 'absolute', left: pill.left, top: pill.top, width: pill.w, height: pill.h, borderRadius: pill.r, ...glass(false), transform: `scale(${pillIn})`, overflow: 'hidden'}}>
-					<div style={{position: 'absolute', left: PILL.left - pill.left, top: PILL.cy - PILL.h1 / 2 - pill.top, width: PILL.w1, height: PILL.h1, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily, fontWeight: 600, fontSize: PILL.font, lineHeight: '62px', letterSpacing: '-0.03em', color: WHITE, textShadow: '0 1px 12px rgba(0,0,0,0.18)'}}>
-						<Lines t={t} lines={[WORDS.gag1.slice(0, 3), WORDS.gag1.slice(3)]} out={T.gag2 - 0.22} />
+					<RimLight t={t} radius={pill.r} />
+					{/* "Okay." */}
+					<div style={{position: 'absolute', left: PILL.left - pill.left, top: PILL.cy - PILL.h / 2 - pill.top, width: PILL.wOk, height: PILL.h, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily, fontWeight: 600, fontSize: PILL.font, letterSpacing: '-0.03em', color: WHITE, textShadow: '0 1px 12px rgba(0,0,0,0.18)'}}>
+						<Lines t={t} lines={[WORDS.ok]} out={T.motivated - 0.2} />
 					</div>
-					<div style={{position: 'absolute', left: PILL.left + PILL.pad - pill.left, top: PILL.cy - PILL.h2 / 2 - pill.top, height: PILL.h2, display: 'flex', alignItems: 'center', fontFamily, fontWeight: 600, fontSize: 54, letterSpacing: '-0.03em', color: WHITE, whiteSpace: 'nowrap'}}>
-						<Rise t={t} at={WORDS.gag2[0].start - 0.06} out={T.flood}>
+					{/* "He's really motivated," then "isn't he?" on a second line, the pill growing to hold it */}
+					<div style={{position: 'absolute', left: PILL.left - pill.left, top: PILL.cy - PILL.line / 2 - (PILL.line / 2) * twoLines - pill.top, width: PILL.w1, fontFamily, fontWeight: 600, fontSize: PILL.font, lineHeight: `${PILL.line}px`, letterSpacing: '-0.03em', color: WHITE, textShadow: '0 1px 12px rgba(0,0,0,0.18)'}}>
+						<Lines t={t} lines={[WORDS.motivated, WORDS.isnthe]} out={T.andyou - 0.22} deco={(w) => (w.w.startsWith('motivated') && t < T.andyou - 0.15 ? <Underline t={t} at={w.start + 0.15} /> : null)} />
+					</div>
+					<div style={{position: 'absolute', left: PILL.left + PILL.pad - pill.left, top: PILL.cy - PILL.h / 2 - pill.top, height: PILL.h, display: 'flex', alignItems: 'center', fontFamily, fontWeight: 600, fontSize: 54, letterSpacing: '-0.03em', color: WHITE, whiteSpace: 'nowrap'}}>
+						<Rise t={t} at={WORDS.andyou[0].start - 0.06} out={T.flood}>
 							And
 						</Rise>
 						<span style={{display: 'inline-block', width: 12 + YOU_W + 12}} />
@@ -235,9 +264,10 @@ export const MotionAd: React.FC = () => {
 					)}
 					{t >= T.adEnd && <Img src={staticFile('ad/last.png')} style={{position: 'absolute', width: W, height: H}} />}
 					{t >= T.adEnd && (
-						<div style={{position: 'absolute', left: 0, right: 0, top: 616, display: 'flex', justifyContent: 'center'}}>
-							<div style={{height: 92, padding: '0 40px', borderRadius: 46, background: INK, display: 'flex', alignItems: 'center', fontFamily, fontWeight: 600, fontSize: 40, letterSpacing: '-0.02em', color: WHITE, transform: `scale(${backIn})`, boxShadow: '0 16px 40px rgba(0,0,0,0.18)', whiteSpace: 'pre'}}>
-								<Lines t={t} lines={[WORDS.back]} />
+						<div style={{position: 'absolute', left: back.left, top: back.top, width: back.w, height: back.h, borderRadius: back.r, background: INK, overflow: 'hidden', transform: `scale(${backIn})`, boxShadow: '0 16px 40px rgba(0,0,0,0.18)'}}>
+							<RimLight t={t} radius={back.r} color={LIME} />
+							<div style={{position: 'absolute', left: 40, top: 0, height: 92, display: 'flex', alignItems: 'center', fontFamily, fontWeight: 600, fontSize: 40, letterSpacing: '-0.02em', color: WHITE, whiteSpace: 'pre'}}>
+								<Lines t={t} lines={[[...WORDS.alright, ...WORDS.where]]} />
 							</div>
 						</div>
 					)}
@@ -271,6 +301,9 @@ export const MotionAd: React.FC = () => {
 				</div>
 			)}
 
+			<EdgeRing x={centre.x} y={centre.y} r={r} k={t >= T.contract ? EASE(clamp01((t - T.contract) / 0.5)) : EASE(clamp01((t - T.flood) / 0.5))} />
+			<Ripple t={t} at={T.press} x={PLAY_BTN.x} y={PLAY_BTN.y} />
+			<Ripple t={t} at={T.playPress} x={PLAY_BTN.x} y={PLAY_BTN.y} />
 			<Cursor x={cx} y={cy} press={press} />
 
 			{VOICE.map((v) => (
