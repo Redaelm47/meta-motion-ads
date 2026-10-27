@@ -17,16 +17,16 @@ const POP: Spring = {response: 0.38, damping: 0.78};
 const ZOOM_IN: Spring = {response: 0.6, damping: 0.95};
 const ZOOM_OUT: Spring = {response: 0.8, damping: 1};
 const PUFF_AT = [0.45, 0.6, 0.75];
-// Puffs and bubble rise from the head, measured on screen once the camera has zoomed in (offsets
-// tuned on the parkour clip, the bubble kept inside the frame).
-const HEAD = {x: VIDEO.anchor.x + (VIDEO.head.x - VIDEO.subject.x) * VIDEO.zoom, y: VIDEO.anchor.y + (VIDEO.head.y - VIDEO.subject.y) * VIDEO.zoom};
-const LIFT = Math.min(206, HEAD.y - 150); // how far above the head the bubble sits
-const PUFFS = [
-	{x: HEAD.x + 118, y: HEAD.y - LIFT * 0.53, r: 11},
-	{x: HEAD.x + 172, y: HEAD.y - LIFT * 0.77, r: 17},
-	{x: HEAD.x + 244, y: HEAD.y - LIFT, r: 25},
-];
-const BUB = {left: HEAD.x + 292, cy: HEAD.y - LIFT, h1: 116, h2: 176, font: 50, line: 60, pad: 50};
+// Puffs and bubble rise from the head, measured on screen once the camera has zoomed in. When the
+// head is high in the frame there is no room above: the bubble goes beside the person instead.
+const Z = VIDEO.zoom;
+const toScreen = (x: number, y: number) => ({x: VIDEO.anchor.x + (x - VIDEO.subject.x) * Z, y: VIDEO.anchor.y + (y - VIDEO.subject.y) * Z});
+const HEAD = toScreen(VIDEO.head.x, VIDEO.head.y);
+const RIGHT = toScreen(VIDEO.box.x1, 0).x;
+const above = HEAD.y - 206 >= 150;
+const BUB = {left: above ? HEAD.x + 292 : Math.max(HEAD.x + 292, RIGHT + 60), cy: above ? HEAD.y - 206 : Math.max(150, HEAD.y + 40), h1: 116, h2: 176, font: 50, line: 60, pad: 50};
+// three puffs on the way from the head to the bubble's left end
+const PUFFS = [0.4, 0.62, 0.85].map((f, i) => ({x: lerp(HEAD.x + 60, BUB.left - 20, f), y: lerp(HEAD.y - 40, BUB.cy, f), r: [11, 17, 25][i]}));
 const BACK = {left: 840, cy: 640, h: 96, font: 42, pad: 44};
 const bubW = (s: string) => textWidth(s, BUB.font, -0.03);
 const backW = (s: string) => textWidth(s, BACK.font, -0.02);
@@ -195,11 +195,11 @@ export const ThoughtScripted: React.FC<{script: string}> = ({script}) => {
 						<>
 							{[{x: BACK.left - 10, y: BACK.cy + 72, r: 9, d: 0.2}, {x: BACK.left + 30, y: BACK.cy + 42, r: 14, d: 0.1}].map((p, i) => {
 								const pk = step(t - (outs[0].t - 0.12 - p.d), POP);
-								return <div key={i} style={{position: 'absolute', left: p.x - p.r, top: p.y - p.r, width: 2 * p.r, height: 2 * p.r, borderRadius: p.r, background: INK, transform: `scale(${pk})`}} />;
+								return <div key={i} style={{position: 'absolute', left: p.x - p.r, top: p.y - p.r, width: 2 * p.r, height: 2 * p.r, borderRadius: p.r, background: AD.lastDark ? WHITE : INK, transform: `scale(${pk})`}} />;
 							})}
-							<div style={{position: 'absolute', left: back.left, top: back.top, width: back.w, height: back.h, borderRadius: back.r, background: INK, overflow: 'hidden', transform: `scale(${backIn})`, boxShadow: '0 16px 40px rgba(0,0,0,0.18)'}}>
+							<div style={{position: 'absolute', left: back.left, top: back.top, width: back.w, height: back.h, borderRadius: back.r, background: AD.lastDark ? WHITE : INK, overflow: 'hidden', transform: `scale(${backIn})`, boxShadow: '0 16px 40px rgba(0,0,0,0.18)'}}>
 								<RimLight t={t} radius={back.r} colors={[PALETTE.orange, PALETTE.lilac]} />
-								<div style={{position: 'absolute', left: BACK.pad, top: 0, height: BACK.h, display: 'flex', alignItems: 'center', fontFamily, fontWeight: 600, fontSize: BACK.font, letterSpacing: '-0.02em', color: WHITE, whiteSpace: 'pre'}}>
+								<div style={{position: 'absolute', left: BACK.pad, top: 0, height: BACK.h, display: 'flex', alignItems: 'center', fontFamily, fontWeight: 600, fontSize: BACK.font, letterSpacing: '-0.02em', color: AD.lastDark ? INK : WHITE, whiteSpace: 'pre'}}>
 									<span>
 										<Words t={t} words={outWords} />
 									</span>

@@ -21,11 +21,12 @@ const ARC = VIDEO.trajectory;
 const LAND = ARC ? {x: ARC.x1, y: ARC.y1} : VIDEO.subject;
 const ZOOM = 1.35;
 
-const SRC0 = VIDEO.freezeAt - 1.3;
+// a short shot is played slower before the stop, so the clip never starts in the previous shot
+const LEAD_RATE = Math.min(1, (VIDEO.freezeAt - ((VIDEO as {steadyFrom?: number}).steadyFrom ?? 0)) / 1.3);
 const stop = 1.3; // first stop, on the peak
 const rewind = stop + 0.25;
 const REWIND = 0.75; // back 0.8 s of source
-const BACK = 0.8;
+const BACK = Math.min(0.8, VIDEO.freezeAt - ((VIDEO as {steadyFrom?: number}).steadyFrom ?? 0)); // never rewind past a cut
 const replay = rewind + REWIND + 0.15; // 0.5x, easing to a stop on the peak
 const SLOW_RATE = 0.5;
 const easeIn = replay + (BACK - (SLOW_RATE * 0.5) / 2) / SLOW_RATE;
@@ -46,7 +47,7 @@ const CUES = V.cues({wait, again, look, brought, back});
 const W_ = Object.fromEntries(CUES.map((c) => [c.key, c.words])) as Record<string, Word[]>;
 
 const src = (t: number) => {
-	if (t < stop) return SRC0 + t;
+	if (t < stop) return VIDEO.freezeAt - (stop - t) * LEAD_RATE;
 	if (t < rewind) return VIDEO.freezeAt;
 	if (t < replay) return VIDEO.freezeAt - BACK * EASE(clamp01((t - rewind) / REWIND));
 	if (t < easeIn) return VIDEO.freezeAt - BACK + SLOW_RATE * (t - replay);
@@ -107,8 +108,9 @@ export const Replay: React.FC = () => {
 	// Camera pushes in during the slow motion, out as the action resumes.
 	const k = glide(t, replay, 1.6) - glide(t, contract + 0.1, 0.8);
 	const sc = lerp(1, ZOOM, k);
-	const fx = lerp(W / 2, VIDEO.subject.x - 80, k);
-	const fy = lerp(H / 2, VIDEO.subject.y + 40, k);
+	// the focus never lets the frame's edge into the picture
+	const fx = Math.min(Math.max(lerp(W / 2, VIDEO.subject.x - 80, k), W / (2 * sc)), W - W / (2 * sc));
+	const fy = Math.min(Math.max(lerp(H / 2, VIDEO.subject.y + 40, k), H / (2 * sc)), H - H / (2 * sc));
 	const toScreen = (x: number, y: number) => ({x: (x - fx) * sc + W / 2, y: (y - fy) * sc + H / 2});
 
 	const draw = glide(t, freeze + 0.1, 0.6);

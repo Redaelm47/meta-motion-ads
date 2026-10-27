@@ -22,6 +22,10 @@ const POP: Spring = {response: 0.38, damping: 0.78};
 const SUBJECT_BOX = VIDEO.box;
 // The pill is born at the subject's hand side, on screen once the camera has zoomed in.
 const BIRTH = {x: VIDEO.anchor.x + 240, y: VIDEO.anchor.y + 140};
+// The pill sits on the free side: right of the person (left edge fixed), or left of them when
+// they are on the right of the frame (right edge fixed, 50 px clear of them).
+const ON_LEFT = VIDEO.anchor.x > 960;
+const PILL_RIGHT = VIDEO.anchor.x + (VIDEO.box.x0 - VIDEO.subject.x) * VIDEO.zoom - 50;
 const PILL = {left: 1000, cy: 400, h1: 116, h2: 176, pad: 46, font: 52, line: 62};
 const YOU_H = 62;
 const YOU_W = (AD.you.w * YOU_H) / AD.you.h;
@@ -29,6 +33,7 @@ const BACK = {cy: 662, h: 92, pad: 40, font: 40};
 
 // Words are separated by a space each in the layout, so measuring the joined text is exact.
 const pillW = (s: string) => textWidth(s, PILL.font, -0.03);
+const leftOf = (w: number) => (ON_LEFT ? PILL_RIGHT - w : PILL.left);
 const backW = (s: string) => textWidth(s, BACK.font, -0.02);
 
 /** Everything timed from the voice takes: when each line plays, pill states, cut points. */
@@ -120,12 +125,12 @@ export const Gag: React.FC<{script?: string}> = ({script = 'superman'}) => {
 	pills.forEach((ls, i) => {
 		const first = {w: 2 * PILL.pad + pillW(textOf(ls[0].words)), h: PILL.h1};
 		const one = ls.length > 1 ? first : sizes[i];
-		keys.push({t: ls[0].t - (i ? 0.12 : 0.25), cx: PILL.left + one.w / 2, cy: PILL.cy, w: one.w, h: one.h, r: PILL.h1 / 2});
-		if (ls.length > 1) keys.push({t: ls[1].t - 0.1, cx: PILL.left + sizes[i].w / 2, cy: PILL.cy, w: sizes[i].w, h: sizes[i].h, r: PILL.h1 / 2});
+		keys.push({t: ls[0].t - (i ? 0.12 : 0.25), cx: leftOf(one.w) + one.w / 2, cy: PILL.cy, w: one.w, h: one.h, r: PILL.h1 / 2});
+		if (ls.length > 1) keys.push({t: ls[1].t - 0.1, cx: leftOf(sizes[i].w) + sizes[i].w / 2, cy: PILL.cy, w: sizes[i].w, h: sizes[i].h, r: PILL.h1 / 2});
 	});
 	if (youAt) {
 		const last = sizes[sizes.length - 1];
-		keys.push({t: youAt - 0.12, cx: PILL.left + last.w / 2, cy: PILL.cy, w: last.w, h: last.h, r: PILL.h1 / 2});
+		keys.push({t: youAt - 0.12, cx: leftOf(last.w) + last.w / 2, cy: PILL.cy, w: last.w, h: last.h, r: PILL.h1 / 2});
 	}
 	const pill = morphGlide(t, keys, 0.42, 0.6);
 	pill.r = Math.min(pill.w, pill.h, PILL.h1) / 2;
@@ -133,7 +138,7 @@ export const Gag: React.FC<{script?: string}> = ({script = 'superman'}) => {
 
 	// The ad's own "You", landing at the end of the last line, then flying to the ad's first frame.
 	const lastLine = pills[pills.length - 1];
-	const youX = PILL.left + PILL.pad + pillW(textOf(lastLine[lastLine.length - 1].words)) + 16;
+	const youX = leftOf(sizes[sizes.length - 1].w) + PILL.pad + pillW(textOf(lastLine[lastLine.length - 1].words)) + 16;
 	const youY = PILL.cy + (lastLine.length > 1 ? PILL.line / 2 : 0) - YOU_H / 2 - 2;
 	const fly = glide(t, flood + 0.02, 0.62);
 	const you = {x: lerp(youX, AD.you.x, fly), y: lerp(youY, AD.you.y, fly), w: lerp(YOU_W, AD.you.w, fly), h: lerp(YOU_H, AD.you.h, fly)};
@@ -204,7 +209,7 @@ export const Gag: React.FC<{script?: string}> = ({script = 'superman'}) => {
 						const next = i < pills.length - 1 ? pills[i + 1][0].t - 0.22 : flood;
 						const two = ls.length > 1 ? glide(t, ls[1].t - 0.1, 0.6) : 0;
 						return (
-							<div key={i} style={{position: 'absolute', left: PILL.left + PILL.pad - pill.left, top: PILL.cy - PILL.line / 2 - (PILL.line / 2) * two - pill.top, ...text}}>
+							<div key={i} style={{position: 'absolute', left: leftOf(sizes[i].w) + PILL.pad - pill.left, top: PILL.cy - PILL.line / 2 - (PILL.line / 2) * two - pill.top, ...text}}>
 								{ls.map((l) => (
 									<Line key={l.key} t={t} words={l.words} out={next} />
 								))}
@@ -220,9 +225,9 @@ export const Gag: React.FC<{script?: string}> = ({script = 'superman'}) => {
 					{!youAt && t < adEnd && <Img src={staticFile(AD.first)} style={{position: 'absolute', width: W, height: H, opacity: glide(t, flood + 0.25, 0.4)}} />}
 					{t >= adEnd && <Img src={staticFile(AD.last)} style={{position: 'absolute', width: W, height: H}} />}
 					{t >= adEnd && (
-						<div style={{position: 'absolute', left: back.left, top: back.top, width: back.w, height: back.h, borderRadius: back.r, background: INK, overflow: 'hidden', transform: `scale(${backIn})`, boxShadow: '0 16px 40px rgba(0,0,0,0.18)'}}>
+						<div style={{position: 'absolute', left: back.left, top: back.top, width: back.w, height: back.h, borderRadius: back.r, background: AD.lastDark ? WHITE : INK, overflow: 'hidden', transform: `scale(${backIn})`, boxShadow: '0 16px 40px rgba(0,0,0,0.18)'}}>
 							<RimLight t={t} radius={back.r} colors={[PALETTE.orange, PALETTE.lilac]} />
-							<div style={{position: 'absolute', left: BACK.pad, top: 0, height: BACK.h, display: 'flex', alignItems: 'center', fontFamily, fontWeight: 600, fontSize: 40, letterSpacing: '-0.02em', color: WHITE, whiteSpace: 'pre'}}>
+							<div style={{position: 'absolute', left: BACK.pad, top: 0, height: BACK.h, display: 'flex', alignItems: 'center', fontFamily, fontWeight: 600, fontSize: 40, letterSpacing: '-0.02em', color: AD.lastDark ? INK : WHITE, whiteSpace: 'pre'}}>
 								<Line t={t} words={outWords} out={Infinity} />
 							</div>
 						</div>

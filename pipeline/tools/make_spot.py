@@ -68,16 +68,34 @@ def make(a):
     d.mkdir(parents=True, exist_ok=True)
     video, ad = resolve(a.video), resolve(a.ad)
     start = max(0.0, a.freeze - BEFORE)
+    # Optional crop (w:h:x:y in the source's 1920x1080 frame), e.g. to keep someone out of the picture.
+    crop, k, (ox, oy) = "", 1.0, (0, 0)
+    if a.crop:
+        cw, ch, ox, oy = (int(v) for v in a.crop.split(":"))
+        crop, k = f"scale=1920:1080,crop={cw}:{ch}:{ox}:{oy},", 1920 / cw
     freeze_at = a.freeze - start
 
     # The clip, 1920x1080 at 30 fps, and the frozen frame.
-    ff("-ss", start, "-t", BEFORE + AFTER, "-i", video, "-vf", f"{FIT},fps=30", "-c:v", "libx264", "-crf", "16", "-pix_fmt", "yuv420p", "-an", d / "clip.mp4")
+    ff("-ss", start, "-t", BEFORE + AFTER, "-i", video, "-vf", f"{crop}{FIT},fps=30", "-c:v", "libx264", "-crf", "16", "-pix_fmt", "yuv420p", "-an", d / "clip.mp4")
     end = float(probe(d / "clip.mp4", "format=duration"))
     ff("-ss", freeze_at, "-i", d / "clip.mp4", "-frames:v", "1", d / "freeze.png")
 
     # The person under the point.
     x, y = (float(v) for v in a.subject.split(","))
-    sh("swift", CUTOUT, d / "freeze.png", x, y, d / "person.png", d / "person_mask.png")
+    x, y = (x - ox) * k, (y - oy) * k
+    if a.cutout_box:  # look for the person only inside this box (Vision can prefer a bigger object)
+        bw, bh, bx, by = (int(v) for v in a.cutout_box.split(":"))
+        ff("-i", d / "freeze.png", "-vf", f"crop={bw}:{bh}:{bx}:{by}", d / "cut_in.png")
+        sh("swift", CUTOUT, d / "cut_in.png", x - bx, y - by, d / "cut_rgba.png", d / "cut_mask.png")
+        rgba, m = Image.new("RGBA", (1920, 1080)), Image.new("L", (1920, 1080))
+        rgba.paste(Image.open(d / "cut_rgba.png"), (bx, by))
+        m.paste(Image.open(d / "cut_mask.png").convert("L"), (bx, by))
+        rgba.save(d / "person.png")
+        m.save(d / "person_mask.png")
+        for f in ("cut_in.png", "cut_rgba.png", "cut_mask.png"):
+            (d / f).unlink()
+    else:
+        sh("swift", CUTOUT, d / "freeze.png", x, y, d / "person.png", d / "person_mask.png")
     mask = np.asarray(Image.open(d / "person_mask.png").convert("L")) > 127
     ys, xs = np.nonzero(mask)
     x0, x1, y0, y1 = int(xs.min()), int(xs.max()), int(ys.min()), int(ys.max())
@@ -93,9 +111,16 @@ def make(a):
         return int(np.clip(want, lo, hi))
     anchor = {"x": fit(720, subject["x"], 1920), "y": fit(560, subject["y"], 1080)}
 
+    # The shot the moment is in: the lead-in and any rewind must not cross a cut.
+    raw = subprocess.run(["ffmpeg", "-loglevel", "error", "-i", str(d / "clip.mp4"), "-vf", "fps=30,scale=160:90,format=gray", "-f", "rawvideo", "-"], capture_output=True, check=True).stdout
+    g = np.frombuffer(raw, np.uint8).reshape(-1, 90, 160).astype(np.float32)
+    jumps = np.abs(np.diff(g, axis=0)).mean(axis=(1, 2))
+    cuts = [(i + 1) / 30 for i, j in enumerate(jumps) if j > max(30.0, 4 * np.median(jumps)) and (i + 1) / 30 < freeze_at - 0.05]
+    steady_from = round(max(cuts) + 0.05, 3) if cuts else 0.0
+
     # Slow-motion lead-in (0.75x, motion-interpolated to 50 fps) and 60 fps source frames.
-    lead_in = freeze_at - LEAD
-    ff("-ss", lead_in, "-t", LEAD + 0.05, "-i", d / "clip.mp4", "-vf", "setpts=PTS/0.75,minterpolate=fps=50:mi_mode=mci:mc_mode=aobmc:vsbmc=1",
+    lead_in = max(freeze_at - LEAD, steady_from)
+    ff("-ss", lead_in, "-t", freeze_at - lead_in + 0.05, "-i", d / "clip.mp4", "-vf", "setpts=PTS/0.75,minterpolate=fps=50:mi_mode=mci:mc_mode=aobmc:vsbmc=1",
        "-c:v", "libx264", "-crf", "16", "-pix_fmt", "yuv420p", d / "leadin.mp4")
     frames = d / "frames"
     frames.mkdir(exist_ok=True)
@@ -114,12 +139,13 @@ def make(a):
     border = np.asarray(Image.open(d / "first.png").convert("RGB"))
     edge = np.concatenate([border[:20].reshape(-1, 3), border[-20:].reshape(-1, 3), border[:, :20].reshape(-1, 3), border[:, -20:].reshape(-1, 3)])
     paper = "#%02x%02x%02x" % tuple(int(v) for v in np.median(edge, axis=0))
+    last_dark = bool(np.asarray(Image.open(d / "last.png").convert("L")).mean() < 110)
 
     spot = {
         "name": a.name,
         "video": {
             "clip": rel(d / "clip.mp4"), "leadInClip": rel(d / "leadin.mp4"), "freeze": rel(d / "freeze.png"), "person": rel(d / "person.png"),
-            "leadIn": round(lead_in, 4), "freezeAt": round(freeze_at, 4), "end": round(end, 3), "leadInRate": 0.75,
+            "leadIn": round(lead_in, 4), "freezeAt": round(freeze_at, 4), "end": round(end, 3), "leadInRate": 0.75, "steadyFrom": steady_from,
             "subject": subject, "anchor": anchor, "zoom": round(zoom, 3),
             "box": {"x0": x0, "y0": y0, "x1": x1, "y1": y1}, "head": head,
             "frames": {"dir": rel(frames), "freezeIndex": int(round((freeze_at - f0) * 60)), "count": count},
@@ -127,7 +153,7 @@ def make(a):
         },
         "ad": {
             "video": rel(d / "ad.mp4"), "audio": rel(d / "ad.wav"), "duration": duration, "brand": a.brand or Path(a.ad).stem, "site": "",
-            "paper": paper, "letterInk": "#111111", "first": rel(d / "first.png"), "last": rel(d / "last.png"), "you": None,
+            "paper": paper, "letterInk": "#111111", "first": rel(d / "first.png"), "last": rel(d / "last.png"), "lastDark": last_dark, "you": None,
         },
         "scripts": {},
         "voices": {},
@@ -166,6 +192,8 @@ def main():
     m.add_argument("--ad", required=True)
     m.add_argument("--brand")
     m.add_argument("--zoom", type=float)
+    m.add_argument("--cutout-box", help="w:h:x:y in the output frame: run the cutout inside this box only")
+    m.add_argument("--crop", help="w:h:x:y in the source frame (scaled to 1920x1080)")
     s = sub.add_parser("script")
     s.add_argument("--name", required=True)
     s.add_argument("--script", required=True)

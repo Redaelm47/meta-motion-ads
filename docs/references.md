@@ -37,6 +37,11 @@ back here first; add to it whenever something new is used.
 - [docs/references-humour.md](references-humour.md): sponsor segues that work, memes and famous
   lines to twist, comedy writing techniques for very short jokes, candidate gags, with sources.
 
+## Mainstream test material
+
+- [docs/tests-mainstream.md](tests-mainstream.md): the MrBeast, Red Bull, Dude Perfect and GoPro
+  videos and the Volvo, PS5, Mercedes and Samsung ads used to test the system, with their URLs.
+
 ## Footage and sound
 
 - Clips: Pexels only, listed in `clips/SOURCES.md`.

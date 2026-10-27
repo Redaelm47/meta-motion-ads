@@ -69,3 +69,19 @@ python3 tools/render.py out/replay.mp4 --comp=Replay                            
 `--comp` is the composition (`MotionAd`, `Replay`, `Thought`, `Squeeze`, `Hush`, `Billboard`). `--preview` keeps
 only the ad's first and last 2.5 s, to judge the bridges. Templates that remap time (Replay's
 rewind and slow motion, Hush's speed ramps) read source frames made by `tools/frames.sh`.
+
+## Any video, any ad: spots
+
+A spot is one video moment plus one ad (`render/public/spots/<name>/`, not committed: the test
+material is other people's). Steps, the same the product runs:
+
+1. **Find the moment**: `pipeline/tools/find_moment.py video.mp4 --sheets out/` lists motion peaks
+   inside a steady shot (a stand-in for Muse Spark, which will also judge what is funny or tense).
+2. **Make the spot**: `pipeline/tools/make_spot.py make --name n --video v.mp4 --freeze 8.6
+   --subject 905,550 --ad ad.mp4` cuts the clip, freezes the frame, cuts the person out, places the
+   camera, makes the slow-motion lead-in and the source frames, and prepares the ad.
+3. **Write the lines** for this video and this ad (Muse Spark in the product): the gag or the
+   thought starts from what the person is doing and leads into what the ad says, often by leaving a
+   sentence for the ad's first line to finish. `make_spot.py script` voices them.
+4. **Render**: `tools/render.py out.mp4 --draft --preview --spot=n --comp=Gag-spot` (or
+   `Thought-spot`, `Replay`, `Hush`, `Squeeze`).
