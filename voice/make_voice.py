@@ -16,6 +16,12 @@ import torch
 from kokoro import KPipeline
 
 SR = 24000
+# The bridge into an existing ad (v3): short, fast, energetic lines; the ad's own voice takes over.
+BRIDGE = [
+    ("gag1", "He's motivated!"),
+    ("gag2", "And you?"),
+    ("back", "Now... his way!"),
+]
 LINES = [
     ("gag1", "He's motivated."),
     ("gag2", "And you?"),
@@ -42,6 +48,7 @@ def main():
     ap.add_argument("--voice", default="am_michael")
     ap.add_argument("--speed", type=float, default=1.0)
     ap.add_argument("--out", default="../render/public/voice")
+    ap.add_argument("--set", choices=["bridge", "ad"], default="bridge")
     args = ap.parse_args()
 
     torch.set_num_threads(4)  # keep the laptop responsive
@@ -50,7 +57,7 @@ def main():
     out.mkdir(parents=True, exist_ok=True)
 
     table = []
-    for key, text in LINES:
+    for key, text in (BRIDGE if args.set == "bridge" else LINES):
         chunks, words = [], []
         offset = 0.0
         for result in pipe(text, voice=args.voice, speed=args.speed):

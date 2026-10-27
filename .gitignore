@@ -13,3 +13,5 @@ render/out/
 *.egg-info/
 # Mixkit's license allows use, not redistribution of the files: see render/public/sfx/SOURCES.md
 render/public/sfx/mixkit-*
+# Third-party ads used for development only (not ours to redistribute)
+render/public/ad/

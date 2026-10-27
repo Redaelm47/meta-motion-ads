@@ -1,0 +1,64 @@
+{
+ "voice": "am_puck",
+ "lines": [
+  {
+   "key": "gag1",
+   "text": "He's motivated!",
+   "file": "bridge/gag1.wav",
+   "duration": 0.809,
+   "words": [
+    {
+     "w": "He's",
+     "start": 0.0,
+     "end": 0.107
+    },
+    {
+     "w": "motivated",
+     "start": 0.107,
+     "end": 0.957
+    }
+   ]
+  },
+  {
+   "key": "gag2",
+   "text": "And you?",
+   "file": "bridge/gag2.wav",
+   "duration": 0.524,
+   "words": [
+    {
+     "w": "And",
+     "start": 0.0,
+     "end": 0.12
+    },
+    {
+     "w": "you",
+     "start": 0.12,
+     "end": 0.52
+    }
+   ]
+  },
+  {
+   "key": "back",
+   "text": "Now... his way!",
+   "file": "bridge/back.wav",
+   "duration": 0.75,
+   "words": [
+    {
+     "w": "Now",
+     "start": 0.0,
+     "end": 0.135
+    },
+    {
+     "w": "his",
+     "start": 0.223,
+     "end": 0.385
+    },
+    {
+     "w": "way",
+     "start": 0.385,
+     "end": 0.885
+    }
+   ]
+  }
+ ]
+}
