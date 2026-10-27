@@ -9,3 +9,7 @@ dist/
 *.mp4
 *.mov
 .DS_Store
+render/out/
+*.egg-info/
+# Mixkit's license allows use, not redistribution of the files: see render/public/sfx/SOURCES.md
+render/public/sfx/mixkit-*
