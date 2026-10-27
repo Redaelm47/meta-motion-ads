@@ -7,12 +7,12 @@ import {MotionAd} from './MotionAd';
 import {MotionAdV1} from './MotionAdV1';
 import {MotionAdV2} from './MotionAdV2';
 
-type Props = {fps: number};
+type Props = {fps: number; variant?: string};
 
 const meta = (total: number) => ({props}: {props: Props}) => ({fps: props.fps, durationInFrames: Math.ceil(total * props.fps)});
 
 const comp = (id: string, component: React.FC, total: number, fps: number) => (
-	<Composition id={id} component={component as React.FC<Props>} width={1920} height={1080} fps={fps} durationInFrames={Math.ceil(total * fps)} defaultProps={{fps}} calculateMetadata={meta(total)} />
+	<Composition id={id} component={component as React.FC<Props>} width={1920} height={1080} fps={fps} durationInFrames={Math.ceil(total * fps)} defaultProps={{fps, variant: 'minimal'}} calculateMetadata={meta(total)} />
 );
 
 // MotionAd: bridge into an existing ad (v3, 50 fps to match the ad's 25 fps).

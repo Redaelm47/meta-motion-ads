@@ -1,10 +1,9 @@
 import React from 'react';
 import {AbsoluteFill, Audio, Img, OffthreadVideo, Sequence, staticFile, useCurrentFrame, useVideoConfig} from 'remotion';
 import {AD, T, VIDEO, VOICE, WORDS} from './ad';
-import {SunShader} from './SunShader';
 import {EASE, QUICK, SOFT, Spring, clamp01, glide, glides, lerp, morphGlide, pulse, step} from './motion';
-import {Aura, Brackets, EdgeRing, PALETTE, RimLight, Ripple, SubjectOutline, Underline} from './details';
-import outline from '../public/demo/person_outline.json';
+import {Aura, Bokeh, Brackets, EdgeRing, Flash, Letterbox, PALETTE, RimLight, Ripple, Underline, Vignette} from './details';
+import {Variant, sfxFor} from './variants';
 import {AD_YELLOW, Cursor, INK, Rise, WHITE, Word, fontFamily, glass} from './ui';
 
 const W = 1920;
@@ -19,8 +18,6 @@ const PLAY_BTN = {x: 62, y: 1046}; // the player's play / pause button
 const BIRTH = {x: 960, y: 700}; // the subject's hand on screen, where the caption pill is born
 // Subject in source-frame coordinates, for the lock-on brackets.
 const SUBJECT_BOX = {x0: 930, y0: 385, x1: 1330, y1: 745};
-// The ad's sun, behind the subject (source-frame coordinates).
-const SUN = {x: 1125, y: 535, r: 240};
 const PILL = {left: 1040, cy: 400, wOk: 250, w1: 650, h1: 116, h2: 176, wYou: 380, h: 116, pad: 46, font: 52, line: 62};
 // "You" inside the pill: the ad's own artwork, at text size.
 const YOU_H = 62;
@@ -44,20 +41,7 @@ const sourceSeconds = (t: number) => {
 	return VIDEO.freezeAt + (t - T.resume);
 };
 
-// Reda's validated recordings and levels (no ticks, no typing sounds).
-const SFX: {t: number; src: string; volume: number}[] = [
-	{t: T.press, src: 'kenney-click_002.ogg', volume: 0.2},
-	{t: T.freeze, src: 'mixkit-166.mp3', volume: 0.2},
-	{t: T.ok - 0.3, src: 'mixkit-2577.mp3', volume: 0.3},
-	{t: T.motivated - 0.12, src: 'mixkit-3115.mp3', volume: 0.14},
-	{t: T.andyou - 0.1, src: 'mixkit-3115.mp3', volume: 0.18},
-	{t: T.flood, src: 'mixkit-166.mp3', volume: 0.2},
-	{t: T.land - 0.05, src: 'kenney-impactWood_light_000.ogg', volume: 0.34},
-	{t: T.alright - 0.08, src: 'mixkit-2577.mp3', volume: 0.3},
-	{t: T.contract, src: 'mixkit-166.mp3', volume: 0.2},
-	{t: T.settle, src: 'mixkit-3115.mp3', volume: 0.12},
-	{t: T.playPress, src: 'kenney-click_002.ogg', volume: 0.2},
-];
+// Sound effects per variant: see variants.ts.
 
 const Lines: React.FC<{t: number; lines: Word[][]; out?: number; deco?: (w: Word) => React.ReactNode}> = ({t, lines, out, deco}) => (
 	<div style={{textAlign: 'center', whiteSpace: 'pre'}}>
@@ -126,7 +110,7 @@ const Player: React.FC<{controls: number; progress: number; paused: boolean; pre
 
 // ---------------------------------------------------------------- the film
 
-export const MotionAd: React.FC = () => {
+export const MotionAd: React.FC<{variant?: Variant}> = ({variant = 'minimal'}) => {
 	const frame = useCurrentFrame();
 	const {fps} = useVideoConfig();
 	const t = frame / fps;
@@ -135,7 +119,8 @@ export const MotionAd: React.FC = () => {
 	// Camera on the frozen frame: in when it pauses, out once we are back from the ad.
 	const k = pulse(t, T.freeze, T.settle, ZOOM_IN, ZOOM_OUT);
 	const drift = 1 + 0.015 * Math.max(0, Math.min(t, T.flood) - T.freeze) * k;
-	const s = lerp(1, VIDEO.zoom, k) * drift;
+	const punch = variant === 'freeze' && t > T.freeze ? 0.06 * Math.exp(-(t - T.freeze) * 7) * Math.min(1, (t - T.freeze) / 0.04) : 0;
+	const s = lerp(1, VIDEO.zoom, k) * drift * (1 + punch);
 	const fx = lerp(W / 2, VIDEO.subject.x, k);
 	const fy = lerp(H / 2, VIDEO.subject.y, k);
 	const ax = lerp(W / 2, VIDEO.anchor.x, k);
@@ -209,12 +194,7 @@ export const MotionAd: React.FC = () => {
 				</Sequence>
 				{paused && (
 					<>
-						<Img src={staticFile(VIDEO.freeze)} style={{position: 'absolute', width: W, height: H, filter: `brightness(${1 - 0.42 * dim}) saturate(${1 - 0.3 * dim}) blur(${4 * dim}px)`}} />
-						{t > T.ok - 0.05 && t < T.adStart && (
-							<div style={{position: 'absolute', left: SUN.x - SUN.r, top: SUN.y - SUN.r, width: 2 * SUN.r, height: 2 * SUN.r, clipPath: `circle(${SUN.r * Math.sqrt(glide(t, T.ok - 0.05, 0.8))}px at 50% 50%)`}}>
-								<SunShader time={t} size={2 * SUN.r} />
-							</div>
-						)}
+						<Img src={staticFile(VIDEO.freeze)} style={{position: 'absolute', width: W, height: H, filter: `brightness(${1 - 0.42 * dim}) saturate(${1 - (variant === 'freeze' ? 0.6 : 0.3) * dim}) blur(${4 * dim}px)`}} />
 						<Img
 							src={staticFile(VIDEO.person)}
 							style={{
@@ -234,7 +214,10 @@ export const MotionAd: React.FC = () => {
 				</Sequence>
 			</AbsoluteFill>
 
-			{paused && <SubjectOutline t={t} d={outline.d} pts={outline.pts} at={T.ok - 0.2} out={T.flood} camera={{tx: ax - fx * s, ty: ay - fy * s, s}} origin={VIDEO.subject} grow={1 + 0.025 * dim} />}
+			{(variant === 'freeze' || variant === 'cinema') && paused && t < T.adStart && <Vignette k={dim} strength={variant === 'freeze' ? 0.6 : 0.45} />}
+			{variant === 'cinema' && <Letterbox k={glide(t, T.freeze, 0.5) - glide(t, T.flood, 0.4)} />}
+			{variant === 'bubbles' && paused && t < T.adStart && <Bokeh t={t} k={glide(t, T.ok - 0.3, 0.8)} />}
+			{variant === 'photo' && <Flash t={t} at={T.freeze} />}
 
 			{/* Glass caption pill */}
 			{paused && t > T.ok - 0.3 && t < T.adStart && (
@@ -318,7 +301,7 @@ export const MotionAd: React.FC = () => {
 					<Audio src={staticFile(v.line.file)} />
 				</Sequence>
 			))}
-			{SFX.map((e, i) => (
+			{sfxFor(variant).map((e, i) => (
 				<Sequence key={i} from={Math.round(e.t * fps)}>
 					<Audio src={staticFile(`sfx/${e.src}`)} volume={e.volume} />
 				</Sequence>

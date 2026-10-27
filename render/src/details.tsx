@@ -1,4 +1,4 @@
-// Motion-design details layered on the bridges: lock-on brackets, the subject's outline, an aura
+// Motion-design details layered on the bridges: lock-on brackets, an aura
 // in the ad's own colours, ripples, a travelling rim light. Scene-space pieces live inside the camera
 // transform and divide their stroke by the camera scale so lines keep the same width on screen.
 
@@ -81,58 +81,6 @@ export const EdgeRing: React.FC<{x: number; y: number; r: number; k: number; col
 		</svg>
 	) : null;
 
-/**
- * A thick white outline that goes around the subject: it starts at the top of the head, two
- * strokes run down both sides with a bright tip each and meet at the feet. Thick on purpose, it
- * covers the small errors of the cutout's edge; the warm glow stays faint. Then a short segment in
- * the ad's orange keeps running around it.
- */
-// Drawn in screen space with the camera's transform on the path: an SVG filter inside the zoomed
-// layer makes Chrome rasterise that whole layer at low resolution.
-export const SubjectOutline: React.FC<{
-	t: number;
-	d: string;
-	pts: number[][];
-	at: number;
-	out: number;
-	camera: {tx: number; ty: number; s: number};
-	origin: {x: number; y: number};
-	grow: number;
-}> = ({t, d, pts, at, out, camera, origin, grow}) => {
-	const k = clamp01(glide(t, at, 1.15));
-	const gone = glide(t, out, 0.35);
-	if (k <= 0.001 || gone >= 0.999) return null;
-	const scale = camera.s * grow;
-	const u = (v: number) => v / scale;
-	const half = k / 2;
-	const dash = {pathLength: 1, strokeDasharray: `${half} ${Math.max(0, 1 - k)} ${half} 0`};
-	const tip = (f: number) => pts[Math.min(pts.length - 1, Math.floor(((f % 1) + 1) % 1 * pts.length))];
-	const tips = k > 0.01 && k < 0.995 ? [tip(half), tip(1 - half)] : [];
-	const run = ((t - at - 1.15) * 0.4) % 1;
-	return (
-		<svg width={1920} height={1080} style={{position: 'absolute', inset: 0, overflow: 'visible', opacity: 1 - gone}}>
-			<defs>
-				<filter id="outline-glow" x="-20%" y="-20%" width="140%" height="140%">
-					<feGaussianBlur stdDeviation={u(6)} />
-				</filter>
-			</defs>
-			<g transform={`translate(${camera.tx} ${camera.ty}) scale(${camera.s}) translate(${origin.x} ${origin.y}) scale(${grow}) translate(${-origin.x} ${-origin.y})`}>
-				<path d={d} fill="none" stroke={PALETTE.deep} strokeWidth={u(22)} strokeLinejoin="round" filter="url(#outline-glow)" opacity={0.35} {...dash} />
-				<path d={d} fill="none" stroke={WHITE} strokeWidth={u(13)} strokeLinejoin="round" strokeLinecap="round" {...dash} />
-				{tips.map(([x, y], i) => (
-					<g key={i}>
-						<circle cx={x} cy={y} r={u(16)} fill={PALETTE.deep} opacity={0.5} filter="url(#outline-glow)" />
-						<circle cx={x} cy={y} r={u(8.5)} fill={WHITE} />
-					</g>
-				))}
-				{k >= 0.995 && t > at + 1.15 && (
-					<path d={d} fill="none" stroke={PALETTE.deep} strokeWidth={u(13)} strokeLinecap="round" pathLength={1} strokeDasharray="0.08 0.92" strokeDashoffset={-run} />
-				)}
-			</g>
-		</svg>
-	);
-};
-
 /** The ad's moving gradient (orange, peach, lilac), tinting a glass shape from the inside. */
 export const Aura: React.FC<{t: number; k: number}> = ({t, k}) => {
 	if (k <= 0.001) return null;
@@ -153,3 +101,65 @@ export const Aura: React.FC<{t: number; k: number}> = ({t, k}) => {
 		/>
 	);
 };
+
+// ---------------------------------------------------------------- variant pieces (being tested)
+
+/** A short exposure flash, like a photo being taken. */
+export const Flash: React.FC<{t: number; at: number}> = ({t, at}) => {
+	const x = t - at;
+	if (x < 0 || x > 0.35) return null;
+	const k = x < 0.04 ? x / 0.04 : 1 - EASE(clamp01((x - 0.04) / 0.31));
+	return <div style={{position: 'absolute', inset: 0, background: WHITE, opacity: 0.55 * k}} />;
+};
+
+/** Darkened edges that close in while the frame is frozen. */
+export const Vignette: React.FC<{k: number; strength?: number}> = ({k, strength = 0.55}) =>
+	k > 0.001 ? <div style={{position: 'absolute', inset: 0, background: `radial-gradient(ellipse at 45% 50%, transparent 45%, rgba(0,0,0,${strength * k}) 100%)`}} /> : null;
+
+/** Cinema bars sliding in from the top and bottom. */
+export const Letterbox: React.FC<{k: number; size?: number}> = ({k, size = 110}) =>
+	k > 0.001 ? (
+		<>
+			<div style={{position: 'absolute', left: 0, right: 0, top: 0, height: size * k, background: '#000'}} />
+			<div style={{position: 'absolute', left: 0, right: 0, bottom: 0, height: size * k, background: '#000'}} />
+		</>
+	) : null;
+
+/** Soft out-of-focus discs in the ad's colours, drifting slowly up, kept away from the subject. */
+const BOKEH = [
+	[1240, 640, 70, PALETTE.orange],
+	[1460, 520, 46, PALETTE.lilac],
+	[1660, 760, 90, PALETTE.peach],
+	[1780, 420, 38, PALETTE.orange],
+	[1320, 880, 54, PALETTE.lilac],
+	[1560, 960, 34, PALETTE.peach],
+	[140, 300, 60, PALETTE.peach],
+	[230, 860, 80, PALETTE.orange],
+	[90, 620, 40, PALETTE.lilac],
+] as const;
+export const Bokeh: React.FC<{t: number; k: number}> = ({t, k}) =>
+	k > 0.001 ? (
+		<>
+			{BOKEH.map(([x, y, r, c], i) => {
+				const rise = (t * (14 + i * 3)) % 200;
+				const pop = clamp01(k * 1.4 - i * 0.05);
+				return (
+					<div
+						key={i}
+						style={{
+							position: 'absolute',
+							left: x - r + 10 * Math.sin(t * 0.8 + i),
+							top: y - r - rise,
+							width: 2 * r,
+							height: 2 * r,
+							borderRadius: r,
+							background: `radial-gradient(circle at 35% 35%, ${WHITE}, ${c} 55%, transparent 72%)`,
+							opacity: 0.55 * pop,
+							transform: `scale(${pop})`,
+							filter: 'blur(5px)',
+						}}
+					/>
+				);
+			})}
+		</>
+	) : null;
