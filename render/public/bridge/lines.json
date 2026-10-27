@@ -1,16 +1,16 @@
 {
- "voice": "am_puck",
+ "voice": "chatterbox",
  "lines": [
   {
    "key": "ok",
    "text": "Okay.",
    "file": "bridge/ok.wav",
-   "duration": 0.595,
+   "duration": 1.181,
    "words": [
     {
-     "w": "Okay",
+     "w": "Okay.",
      "start": 0.0,
-     "end": 0.723
+     "end": 1.181
     }
    ]
   },
@@ -18,22 +18,22 @@
    "key": "motivated",
    "text": "He's really motivated,",
    "file": "bridge/motivated.wav",
-   "duration": 1.199,
+   "duration": 1.136,
    "words": [
     {
      "w": "He's",
      "start": 0.0,
-     "end": 0.169
+     "end": 0.227
     },
     {
      "w": "really",
-     "start": 0.169,
-     "end": 0.419
+     "start": 0.227,
+     "end": 0.568
     },
     {
-     "w": "motivated",
-     "start": 0.419,
-     "end": 1.419
+     "w": "motivated,",
+     "start": 0.568,
+     "end": 1.136
     }
    ]
   },
@@ -41,17 +41,17 @@
    "key": "isnthe",
    "text": "isn't he?",
    "file": "bridge/isnthe.wav",
-   "duration": 0.673,
+   "duration": 0.804,
    "words": [
     {
      "w": "isn't",
      "start": 0.0,
-     "end": 0.246
+     "end": 0.503
     },
     {
-     "w": "he",
-     "start": 0.246,
-     "end": 0.671
+     "w": "he?",
+     "start": 0.503,
+     "end": 0.804
     }
    ]
   },
@@ -59,17 +59,17 @@
    "key": "andyou",
    "text": "And you?",
    "file": "bridge/andyou.wav",
-   "duration": 0.657,
+   "duration": 0.639,
    "words": [
     {
      "w": "And",
      "start": 0.0,
-     "end": 0.193
+     "end": 0.274
     },
     {
-     "w": "you",
-     "start": 0.193,
-     "end": 0.668
+     "w": "you?",
+     "start": 0.274,
+     "end": 0.639
     }
    ]
   },
@@ -77,12 +77,12 @@
    "key": "alright",
    "text": "Alright.",
    "file": "bridge/alright.wav",
-   "duration": 0.598,
+   "duration": 0.728,
    "words": [
     {
-     "w": "Alright",
+     "w": "Alright.",
      "start": 0.0,
-     "end": 0.638
+     "end": 0.728
     }
    ]
   },
@@ -90,22 +90,22 @@
    "key": "where",
    "text": "Where were we?",
    "file": "bridge/where.wav",
-   "duration": 0.655,
+   "duration": 1.119,
    "words": [
     {
      "w": "Where",
      "start": 0.0,
-     "end": 0.092
+     "end": 0.466
     },
     {
      "w": "were",
-     "start": 0.092,
-     "end": 0.204
+     "start": 0.466,
+     "end": 0.839
     },
     {
-     "w": "we",
-     "start": 0.204,
-     "end": 0.679
+     "w": "we?",
+     "start": 0.839,
+     "end": 1.119
     }
    ]
   }

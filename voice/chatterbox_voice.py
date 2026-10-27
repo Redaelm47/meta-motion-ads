@@ -3,7 +3,8 @@
 Same chunks as make_voice.py's BRIDGE, one wav per chunk plus lines.json (word timings spread
 by length, Chatterbox gives none), and a preview with the film's pauses.
 
-    .venv-cb/bin/python chatterbox_voice.py --out samples/cb_expressive --exaggeration 0.7
+    .venv-cb/bin/python chatterbox_voice.py --out samples/cb_expressive --exaggeration 0.75 --cfg 0.35
+    (the film uses this take: copy its wavs and lines.json into ../render/public/bridge)
 """
 
 import argparse
