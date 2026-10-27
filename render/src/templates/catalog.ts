@@ -14,7 +14,7 @@ export type Template = {
 	voice: Voice;
 	fits: Genre[];
 	avoid: Genre[];
-	needs: {person: boolean; peak: boolean}; // a cut-out person, a peak moment to freeze on
+	needs: {person: boolean; peak: boolean; surface?: boolean}; // a cut-out person, a peak moment to freeze on, a flat surface in the frame
 };
 
 export const TEMPLATES: Template[] = [
@@ -73,14 +73,25 @@ export const TEMPLATES: Template[] = [
 		avoid: ['comedy'],
 		needs: {person: false, peak: false},
 	},
+	{
+		id: 'billboard',
+		comp: 'Billboard',
+		name: 'Billboard',
+		idea: 'A flat surface of the scene (a wall, a fence, a screen) lights up like a stadium LED board showing the ad, then the camera dives into it.',
+		energy: 0.55,
+		voice: 'none',
+		fits: ['sport', 'action', 'vlog', 'lifestyle', 'gaming', 'music', 'nature'],
+		avoid: ['asmr'],
+		needs: {person: false, peak: false, surface: true},
+	},
 ];
 
-export type VideoProfile = {genre: Genre; energy: number; hasPerson: boolean; hasPeak: boolean; quietAudio?: boolean};
+export type VideoProfile = {genre: Genre; energy: number; hasPerson: boolean; hasPeak: boolean; hasSurface?: boolean; quietAudio?: boolean};
 export type AdProfile = {energy: number; tone?: 'playful' | 'premium' | 'serious'};
 
 /** Templates ranked for this pair, best first, with the reasons. Never returns one that cannot run. */
 export const pick = (video: VideoProfile, ad: AdProfile) =>
-	TEMPLATES.filter((tp) => (!tp.needs.person || video.hasPerson) && (!tp.needs.peak || video.hasPeak))
+	TEMPLATES.filter((tp) => (!tp.needs.person || video.hasPerson) && (!tp.needs.peak || video.hasPeak) && (!tp.needs.surface || video.hasSurface))
 		.map((tp) => {
 			const why: string[] = [];
 			let score = 0;

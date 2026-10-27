@@ -8,7 +8,7 @@ import {AbsoluteFill, Audio, Img, OffthreadVideo, Sequence, staticFile, useCurre
 import json from '../../public/voice/thought/lines.json';
 import {AD, T as GAG, VIDEO} from '../ad';
 import {Aura, PALETTE, RimLight, Ripple, Vignette} from '../details';
-import {H, PLAY_BTN, Player, SHOWN, W, far} from '../kit';
+import {H, PLAY_BTN, Player, SHOWN, W, far, SourceFrame} from '../kit';
 import {EASE, QUICK, SOFT, Spring, clamp01, glide, glides, lerp, morphGlide, pulse, step} from '../motion';
 import {Cursor, INK, WHITE, Words, fontFamily, glass} from '../ui';
 import {snap, voiceSet} from './voice';
@@ -121,9 +121,11 @@ export const Thought: React.FC = () => {
 	return (
 		<AbsoluteFill style={{background: INK, overflow: 'hidden'}}>
 			<AbsoluteFill style={{transformOrigin: '0 0', transform: `translate(${ax - fx * s}px, ${ay - fy * s}px) scale(${s})`}}>
-				<Sequence durationInFrames={Math.round(freeze * fps)}>
+				<Sequence durationInFrames={Math.round((freeze - 0.06) * fps)}>
 					<OffthreadVideo src={staticFile(VIDEO.leadInClip)} muted />
 				</Sequence>
+				{/* the slow-motion clip's last frames decode black: bridge them with source frames */}
+				{t >= freeze - 0.06 && t < freeze && <SourceFrame s={VIDEO.leadIn + t * VIDEO.leadInRate} />}
 				{paused && (
 					<>
 						<Img src={staticFile(VIDEO.freeze)} style={{position: 'absolute', width: W, height: H, filter: `brightness(${1 - 0.36 * dim}) saturate(${1 - 0.25 * dim}) blur(${4 * dim}px)`}} />

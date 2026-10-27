@@ -4,7 +4,7 @@ import {AdProfile, VideoProfile, pick} from '../src/templates/catalog';
 
 const base44: AdProfile = {energy: 0.6, tone: 'playful'};
 const EXAMPLES: [string, VideoProfile][] = [
-	['parkour jump (this demo)', {genre: 'sport', energy: 0.85, hasPerson: true, hasPeak: true}],
+	['parkour jump (this demo)', {genre: 'sport', energy: 0.85, hasPerson: true, hasPeak: true, hasSurface: true}],
 	['ASMR soap cutting', {genre: 'asmr', energy: 0.05, hasPerson: false, hasPeak: false, quietAudio: true}],
 	['two-hour podcast', {genre: 'podcast', energy: 0.3, hasPerson: true, hasPeak: false}],
 	['daily vlog', {genre: 'vlog', energy: 0.5, hasPerson: true, hasPeak: false}],

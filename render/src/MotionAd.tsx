@@ -6,7 +6,7 @@ import {Aura, Bokeh, Brackets, EdgeRing, Grain, Letterbox, LightLeak, PALETTE, R
 import {Variant, isCinema, sfxFor} from './variants';
 import {Burst, Halftone, NightTint, Scanlines, SpeedLines, TapeGlitch, VhsOsd, neonGlow} from './styles';
 import {AD_YELLOW, Cursor, INK, Rise, WHITE, Word, fontFamily, glass} from './ui';
-import {H, PLAY_BTN, Player, SHOWN, W, far, mix} from './kit';
+import {H, PLAY_BTN, Player, SHOWN, W, far, mix, SourceFrame} from './kit';
 
 const ZOOM_IN: Spring = {response: 0.6, damping: 0.95};
 const ZOOM_OUT: Spring = {response: 0.8, damping: 1};
@@ -162,9 +162,11 @@ export const MotionAd: React.FC<{variant?: Variant}> = ({variant = 'cinema'}) =>
 				}
 			>
 			<AbsoluteFill style={{transformOrigin: '0 0', transform: `translate(${ax - fx * s}px, ${ay - fy * s}px) scale(${s})`}}>
-				<Sequence durationInFrames={Math.round(T.freeze * fps)}>
+				<Sequence durationInFrames={Math.round((T.freeze - 0.06) * fps)}>
 					<OffthreadVideo src={staticFile(VIDEO.leadInClip)} muted />
 				</Sequence>
+				{/* the slow-motion clip's last frames decode black: bridge them with source frames */}
+				{t >= T.freeze - 0.06 && t < T.freeze && <SourceFrame s={VIDEO.leadIn + t * VIDEO.leadInRate} />}
 				{paused && (
 					<>
 						<Img src={staticFile(VIDEO.freeze)} style={{position: 'absolute', width: W, height: H, filter: bgFilter(variant, dim)}} />

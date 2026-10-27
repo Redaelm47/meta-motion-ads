@@ -12,6 +12,7 @@ templates, and picks one per (video, ad) pair.
 | **Thought** | medium | the person's inner voice | vlog, lifestyle, comedy, sport, cooking, tutorials | news, ASMR |
 | **Squeeze** | low | none | podcasts, tutorials, news, streams, music, study | (works anywhere) |
 | **Hush** | very low | none | ASMR, nature, cooking, study, music | comedy |
+| **Billboard** | medium | none | sport, action, vlog, lifestyle, gaming, music, nature | ASMR |
 
 - **Gag**: freeze on the peak, the pause button becomes a glass caption pill, a narrator teases the
   person ("He's really motivated, isn't he? ... And you?"), the ad's own first word lands in place.
@@ -29,12 +30,17 @@ templates, and picks one per (video, ad) pair.
   focus, one soft caption ("take a breath."), the frame melts into the ad's own background colour
   and the ad's first frame comes into focus. Back the same way, the video speeds up from a stop.
 
+- **Billboard**: the ad lives in the video's own world. A flat surface of the scene (here the tarp
+  on the fence behind him) lights up like a stadium LED board showing the ad's first frame, the
+  lamp post stays in front of it, then the camera dives into the board until it is the screen.
+  Needs a flat surface (Muse Spark finds it, SAM 3.1 segments it).
+
 ## How one is picked
 
 `render/src/templates/catalog.ts`, `pick(video, ad)`:
 
 1. Drop templates the video cannot carry (Gag and Thought need a person to cut out; Gag and Replay
-   need a peak moment to freeze on).
+   need a peak moment to freeze on; Billboard needs a flat surface in the frame).
 2. +3 if the template is made for the video's genre, -5 if it must never run on it.
 3. Energy: the wanted energy is 65 % the video's and 35 % the ad's; the further the template is
    from it, the lower it scores.
@@ -53,6 +59,6 @@ python3 tools/render.py out/templates/replay.mp4 --draft --preview --comp=Replay
 python3 tools/render.py out/replay.mp4 --comp=Replay                                # final, 50 fps, motion blur
 ```
 
-`--comp` is the composition (`MotionAd`, `Replay`, `Thought`, `Squeeze`, `Hush`). `--preview` keeps
+`--comp` is the composition (`MotionAd`, `Replay`, `Thought`, `Squeeze`, `Hush`, `Billboard`). `--preview` keeps
 only the ad's first and last 2.5 s, to judge the bridges. Templates that remap time (Replay's
 rewind and slow motion, Hush's speed ramps) read source frames made by `tools/frames.sh`.
