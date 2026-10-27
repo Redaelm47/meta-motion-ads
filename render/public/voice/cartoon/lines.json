@@ -1,0 +1,138 @@
+{
+ "voice": "chatterbox",
+ "lines": [
+  {
+   "key": "fact",
+   "text": "Fun fact:",
+   "file": "voice/cartoon/fact.wav",
+   "duration": 1.279,
+   "words": [
+    {
+     "w": "Fun",
+     "start": 0.0,
+     "end": 0.48
+    },
+    {
+     "w": "fact:",
+     "start": 0.48,
+     "end": 1.279
+    }
+   ]
+  },
+  {
+   "key": "cartoons",
+   "text": "in cartoons, you only fall",
+   "file": "voice/cartoon/cartoons.wav",
+   "duration": 1.645,
+   "words": [
+    {
+     "w": "in",
+     "start": 0.0,
+     "end": 0.15
+    },
+    {
+     "w": "cartoons,",
+     "start": 0.15,
+     "end": 0.822
+    },
+    {
+     "w": "you",
+     "start": 0.822,
+     "end": 1.047
+    },
+    {
+     "w": "only",
+     "start": 1.047,
+     "end": 1.346
+    },
+    {
+     "w": "fall",
+     "start": 1.346,
+     "end": 1.645
+    }
+   ]
+  },
+  {
+   "key": "notice",
+   "text": "when you notice.",
+   "file": "voice/cartoon/notice.wav",
+   "duration": 1.184,
+   "words": [
+    {
+     "w": "when",
+     "start": 0.0,
+     "end": 0.338
+    },
+    {
+     "w": "you",
+     "start": 0.338,
+     "end": 0.592
+    },
+    {
+     "w": "notice.",
+     "start": 0.592,
+     "end": 1.184
+    }
+   ]
+  },
+  {
+   "key": "tell",
+   "text": "So nobody tell him.",
+   "file": "voice/cartoon/tell.wav",
+   "duration": 1.262,
+   "words": [
+    {
+     "w": "So",
+     "start": 0.0,
+     "end": 0.158
+    },
+    {
+     "w": "nobody",
+     "start": 0.158,
+     "end": 0.631
+    },
+    {
+     "w": "tell",
+     "start": 0.631,
+     "end": 0.947
+    },
+    {
+     "w": "him.",
+     "start": 0.947,
+     "end": 1.262
+    }
+   ]
+  },
+  {
+   "key": "okay",
+   "text": "Okay...",
+   "file": "voice/cartoon/okay.wav",
+   "duration": 0.8,
+   "words": [
+    {
+     "w": "Okay...",
+     "start": 0.0,
+     "end": 0.8
+    }
+   ]
+  },
+  {
+   "key": "noticed",
+   "text": "He noticed.",
+   "file": "voice/cartoon/noticed.wav",
+   "duration": 0.672,
+   "words": [
+    {
+     "w": "He",
+     "start": 0.0,
+     "end": 0.134
+    },
+    {
+     "w": "noticed.",
+     "start": 0.134,
+     "end": 0.672
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,120 @@
+{
+ "voice": "chatterbox",
+ "lines": [
+  {
+   "key": "bird",
+   "text": "Is it a bird?",
+   "file": "voice/superman/bird.wav",
+   "duration": 1.022,
+   "words": [
+    {
+     "w": "Is",
+     "start": 0.0,
+     "end": 0.204
+    },
+    {
+     "w": "it",
+     "start": 0.204,
+     "end": 0.409
+    },
+    {
+     "w": "a",
+     "start": 0.409,
+     "end": 0.511
+    },
+    {
+     "w": "bird?",
+     "start": 0.511,
+     "end": 1.022
+    }
+   ]
+  },
+  {
+   "key": "plane",
+   "text": "Is it a plane?",
+   "file": "voice/superman/plane.wav",
+   "duration": 0.821,
+   "words": [
+    {
+     "w": "Is",
+     "start": 0.0,
+     "end": 0.149
+    },
+    {
+     "w": "it",
+     "start": 0.149,
+     "end": 0.299
+    },
+    {
+     "w": "a",
+     "start": 0.299,
+     "end": 0.373
+    },
+    {
+     "w": "plane?",
+     "start": 0.373,
+     "end": 0.821
+    }
+   ]
+  },
+  {
+   "key": "noits",
+   "text": "No, it's...",
+   "file": "voice/superman/noits.wav",
+   "duration": 0.868,
+   "words": [
+    {
+     "w": "No,",
+     "start": 0.0,
+     "end": 0.26
+    },
+    {
+     "w": "it's...",
+     "start": 0.26,
+     "end": 0.868
+    }
+   ]
+  },
+  {
+   "key": "okay",
+   "text": "Okay.",
+   "file": "voice/superman/okay.wav",
+   "duration": 1.181,
+   "words": [
+    {
+     "w": "Okay.",
+     "start": 0.0,
+     "end": 1.181
+    }
+   ]
+  },
+  {
+   "key": "backbird",
+   "text": "Back to the bird.",
+   "file": "voice/superman/backbird.wav",
+   "duration": 1.001,
+   "words": [
+    {
+     "w": "Back",
+     "start": 0.0,
+     "end": 0.286
+    },
+    {
+     "w": "to",
+     "start": 0.286,
+     "end": 0.429
+    },
+    {
+     "w": "the",
+     "start": 0.429,
+     "end": 0.643
+    },
+    {
+     "w": "bird.",
+     "start": 0.643,
+     "end": 1.001
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,153 @@
+{
+ "voice": "chatterbox",
+ "lines": [
+  {
+   "key": "yep",
+   "text": "Yep. That's him.",
+   "file": "voice/scratch/yep.wav",
+   "duration": 1.168,
+   "words": [
+    {
+     "w": "Yep.",
+     "start": 0.0,
+     "end": 0.334
+    },
+    {
+     "w": "That's",
+     "start": 0.334,
+     "end": 0.834
+    },
+    {
+     "w": "him.",
+     "start": 0.834,
+     "end": 1.168
+    }
+   ]
+  },
+  {
+   "key": "wondering",
+   "text": "You're probably wondering",
+   "file": "voice/scratch/wondering.wav",
+   "duration": 1.031,
+   "words": [
+    {
+     "w": "You're",
+     "start": 0.0,
+     "end": 0.269
+    },
+    {
+     "w": "probably",
+     "start": 0.269,
+     "end": 0.628
+    },
+    {
+     "w": "wondering",
+     "start": 0.628,
+     "end": 1.031
+    }
+   ]
+  },
+  {
+   "key": "howgot",
+   "text": "how he got up there.",
+   "file": "voice/scratch/howgot.wav",
+   "duration": 0.992,
+   "words": [
+    {
+     "w": "how",
+     "start": 0.0,
+     "end": 0.186
+    },
+    {
+     "w": "he",
+     "start": 0.186,
+     "end": 0.31
+    },
+    {
+     "w": "got",
+     "start": 0.31,
+     "end": 0.496
+    },
+    {
+     "w": "up",
+     "start": 0.496,
+     "end": 0.62
+    },
+    {
+     "w": "there.",
+     "start": 0.62,
+     "end": 0.992
+    }
+   ]
+  },
+  {
+   "key": "better",
+   "text": "Better question:",
+   "file": "voice/scratch/better.wav",
+   "duration": 0.851,
+   "words": [
+    {
+     "w": "Better",
+     "start": 0.0,
+     "end": 0.34
+    },
+    {
+     "w": "question:",
+     "start": 0.34,
+     "end": 0.851
+    }
+   ]
+  },
+  {
+   "key": "anyway",
+   "text": "Anyway.",
+   "file": "voice/scratch/anyway.wav",
+   "duration": 0.409,
+   "words": [
+    {
+     "w": "Anyway.",
+     "start": 0.0,
+     "end": 0.409
+    }
+   ]
+  },
+  {
+   "key": "thats",
+   "text": "That's how he got up there.",
+   "file": "voice/scratch/thats.wav",
+   "duration": 1.237,
+   "words": [
+    {
+     "w": "That's",
+     "start": 0.0,
+     "end": 0.337
+    },
+    {
+     "w": "how",
+     "start": 0.337,
+     "end": 0.506
+    },
+    {
+     "w": "he",
+     "start": 0.506,
+     "end": 0.619
+    },
+    {
+     "w": "got",
+     "start": 0.619,
+     "end": 0.787
+    },
+    {
+     "w": "up",
+     "start": 0.787,
+     "end": 0.9
+    },
+    {
+     "w": "there.",
+     "start": 0.9,
+     "end": 1.237
+    }
+   ]
+  }
+ ]
+}

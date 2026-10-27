@@ -28,6 +28,44 @@ SETS = {
         ("okay2", "Okay."),
         ("nowjump", "Now jump."),
     ],
+    # Gag scripts from docs/references-humour.md (twists of famous lines; the ad's own "You" is the punchline).
+    "superman": [
+        ("bird", "Is it a bird?"),
+        ("plane", "Is it a plane?"),
+        ("noits", "No, it's..."),
+        ("okay", "Okay."),
+        ("backbird", "Back to the bird."),
+    ],
+    "cartoon": [
+        ("fact", "Fun fact:"),
+        ("cartoons", "in cartoons, you only fall"),
+        ("notice", "when you notice."),
+        ("tell", "So nobody tell him."),
+        ("okay", "Okay..."),
+        ("noticed", "He noticed."),
+    ],
+    "scratch": [
+        ("yep", "Yep. That's him."),
+        ("wondering", "You're probably wondering"),
+        ("howgot", "how he got up there."),
+        ("better", "Better question:"),
+        ("anyway", "Anyway."),
+        ("thats", "That's how he got up there."),
+    ],
+    "buffering": [
+        ("quick", "Quick pause."),
+        ("fine", "He's fine."),
+        ("just", "He's just..."),
+        ("buffer", "buffering."),
+        ("done", "Done buffering."),
+    ],
+    # Nature documentary narrator: calm take (--exaggeration 0.35 --cfg 0.5).
+    "nature": [
+        ("leaps", "The young male leaps,"),
+        ("boss", "to show the others who's boss."),
+        ("wall", "The wall is not impressed."),
+        ("resumes", "Nature resumes."),
+    ],
     # Thought (inner voice): a thought bubble, the idea is the ad.
     "thought": [
         ("hmm", "Hmm..."),

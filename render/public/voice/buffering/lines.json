@@ -1,0 +1,90 @@
+{
+ "voice": "chatterbox",
+ "lines": [
+  {
+   "key": "quick",
+   "text": "Quick pause.",
+   "file": "voice/buffering/quick.wav",
+   "duration": 0.644,
+   "words": [
+    {
+     "w": "Quick",
+     "start": 0.0,
+     "end": 0.293
+    },
+    {
+     "w": "pause.",
+     "start": 0.293,
+     "end": 0.644
+    }
+   ]
+  },
+  {
+   "key": "fine",
+   "text": "He's fine.",
+   "file": "voice/buffering/fine.wav",
+   "duration": 0.69,
+   "words": [
+    {
+     "w": "He's",
+     "start": 0.0,
+     "end": 0.307
+    },
+    {
+     "w": "fine.",
+     "start": 0.307,
+     "end": 0.69
+    }
+   ]
+  },
+  {
+   "key": "just",
+   "text": "He's just...",
+   "file": "voice/buffering/just.wav",
+   "duration": 0.577,
+   "words": [
+    {
+     "w": "He's",
+     "start": 0.0,
+     "end": 0.21
+    },
+    {
+     "w": "just...",
+     "start": 0.21,
+     "end": 0.577
+    }
+   ]
+  },
+  {
+   "key": "buffer",
+   "text": "buffering.",
+   "file": "voice/buffering/buffer.wav",
+   "duration": 0.675,
+   "words": [
+    {
+     "w": "buffering.",
+     "start": 0.0,
+     "end": 0.675
+    }
+   ]
+  },
+  {
+   "key": "done",
+   "text": "Done buffering.",
+   "file": "voice/buffering/done.wav",
+   "duration": 0.868,
+   "words": [
+    {
+     "w": "Done",
+     "start": 0.0,
+     "end": 0.248
+    },
+    {
+     "w": "buffering.",
+     "start": 0.248,
+     "end": 0.868
+    }
+   ]
+  }
+ ]
+}

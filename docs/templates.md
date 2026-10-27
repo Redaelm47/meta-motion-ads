@@ -16,6 +16,13 @@ templates, and picks one per (video, ad) pair.
 
 - **Gag**: freeze on the peak, the pause button becomes a glass caption pill, a narrator teases the
   person ("He's really motivated, isn't he? ... And you?"), the ad's own first word lands in place.
+  The Gag also exists driven by a script (`render/src/templates/Gag.tsx`, scripts in `gags.ts`,
+  compositions `Gag-<name>`): the pill sizes itself to each line, and a script can leave its last
+  sentence hanging so the ad's own first word finishes it. Scripts so far, all from
+  [references-humour.md](references-humour.md): `superman` ("Is it a bird? Is it a plane? No,
+  it's..." + the ad's "You"), `cartoon` ("in cartoons, you only fall when you notice. So nobody
+  tell him." / "Okay... He noticed."), `scratch` (the "Yep, that's him. You're probably wondering
+  how he got up there" freeze-frame meme, "Better question:" + "You").
 - **Replay**: "Wait, wait, wait." The video rewinds, replays in slow motion, a telestrator draws the
   move and marks the landing spot, "This replay is brought to you by..." and the ad floods out of
   the landing spot. Back: "Back to the action!"

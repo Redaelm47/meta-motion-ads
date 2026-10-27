@@ -1,0 +1,122 @@
+{
+ "voice": "chatterbox",
+ "lines": [
+  {
+   "key": "leaps",
+   "text": "The young male leaps,",
+   "file": "voice/nature/leaps.wav",
+   "duration": 1.059,
+   "words": [
+    {
+     "w": "The",
+     "start": 0.0,
+     "end": 0.176
+    },
+    {
+     "w": "young",
+     "start": 0.176,
+     "end": 0.471
+    },
+    {
+     "w": "male",
+     "start": 0.471,
+     "end": 0.706
+    },
+    {
+     "w": "leaps,",
+     "start": 0.706,
+     "end": 1.059
+    }
+   ]
+  },
+  {
+   "key": "boss",
+   "text": "to show the others who's boss.",
+   "file": "voice/nature/boss.wav",
+   "duration": 1.488,
+   "words": [
+    {
+     "w": "to",
+     "start": 0.0,
+     "end": 0.119
+    },
+    {
+     "w": "show",
+     "start": 0.119,
+     "end": 0.357
+    },
+    {
+     "w": "the",
+     "start": 0.357,
+     "end": 0.536
+    },
+    {
+     "w": "others",
+     "start": 0.536,
+     "end": 0.893
+    },
+    {
+     "w": "who's",
+     "start": 0.893,
+     "end": 1.19
+    },
+    {
+     "w": "boss.",
+     "start": 1.19,
+     "end": 1.488
+    }
+   ]
+  },
+  {
+   "key": "wall",
+   "text": "The wall is not impressed.",
+   "file": "voice/nature/wall.wav",
+   "duration": 1.317,
+   "words": [
+    {
+     "w": "The",
+     "start": 0.0,
+     "end": 0.18
+    },
+    {
+     "w": "wall",
+     "start": 0.18,
+     "end": 0.419
+    },
+    {
+     "w": "is",
+     "start": 0.419,
+     "end": 0.539
+    },
+    {
+     "w": "not",
+     "start": 0.539,
+     "end": 0.718
+    },
+    {
+     "w": "impressed.",
+     "start": 0.718,
+     "end": 1.317
+    }
+   ]
+  },
+  {
+   "key": "resumes",
+   "text": "Nature resumes.",
+   "file": "voice/nature/resumes.wav",
+   "duration": 1.209,
+   "words": [
+    {
+     "w": "Nature",
+     "start": 0.0,
+     "end": 0.518
+    },
+    {
+     "w": "resumes.",
+     "start": 0.518,
+     "end": 1.209
+    }
+   ]
+  }
+ ]
+}
