@@ -4,6 +4,7 @@ import {AD, T, VIDEO, VOICE, WORDS} from './ad';
 import {EASE, QUICK, SOFT, Spring, clamp01, glide, glides, lerp, morphGlide, pulse, step} from './motion';
 import {Aura, Bokeh, Brackets, EdgeRing, Grain, Letterbox, LightLeak, PALETTE, RimLight, Ripple, Spotlight, Underline, Vignette} from './details';
 import {Variant, isCinema, sfxFor} from './variants';
+import {Burst, Halftone, NightTint, Scanlines, SpeedLines, TapeGlitch, VhsOsd, neonGlow} from './styles';
 import {AD_YELLOW, Cursor, INK, Rise, WHITE, Word, fontFamily, glass} from './ui';
 
 const W = 1920;
@@ -108,6 +109,23 @@ const Player: React.FC<{controls: number; progress: number; paused: boolean; pre
 	</>
 );
 
+const bgFilter = (v: Variant, dim: number) => {
+	switch (v) {
+		case 'comics':
+			return `brightness(${1 - 0.12 * dim}) saturate(${1 + 0.45 * dim}) contrast(${1 + 0.25 * dim}) blur(${2 * dim}px)`;
+		case 'neon':
+			return `brightness(${1 - 0.45 * dim}) saturate(${1 - 0.4 * dim}) blur(${4 * dim}px)`;
+		case 'apple':
+			return `brightness(${1 - 0.22 * dim}) blur(${10 * dim}px)`;
+		case 'paper':
+			return `brightness(${1 - 0.06 * dim}) saturate(${1 - 0.12 * dim}) contrast(${1 + 0.06 * dim})`;
+		case 'vhs':
+			return `brightness(${1 - 0.2 * dim}) saturate(${1 - 0.25 * dim}) blur(${1.5 * dim}px)`;
+		default:
+			return `brightness(${1 - 0.42 * dim}) saturate(${1 - 0.3 * dim}) blur(${4 * dim}px)`;
+	}
+};
+
 // ---------------------------------------------------------------- the film
 
 export const MotionAd: React.FC<{variant?: Variant}> = ({variant = 'cinema'}) => {
@@ -126,6 +144,7 @@ export const MotionAd: React.FC<{variant?: Variant}> = ({variant = 'cinema'}) =>
 	const ay = lerp(H / 2, VIDEO.anchor.y, k);
 	const dim = pulse(t, T.freeze + 0.05, T.settle, SOFT, ZOOM_OUT);
 	const paused = t >= T.freeze && t < T.resume;
+	const paperK = variant === 'paper' ? glide(t, T.freeze + 0.05, 0.55) - glide(t, T.flood, 0.4) + glide(t, T.contract, 0.4) - glide(t, T.settle + 0.2, 0.5) : 0;
 
 	// Caption pill, born at the subject's hand.
 	const pill = morphGlide(t, [
@@ -185,15 +204,28 @@ export const MotionAd: React.FC<{variant?: Variant}> = ({variant = 'cinema'}) =>
 	const backIn = step(t - (T.alright - 0.12), POP);
 
 	return (
-		<AbsoluteFill style={{backgroundColor: INK, overflow: 'hidden'}}>
+		<AbsoluteFill style={{backgroundColor: variant === 'paper' ? '#e4ddd0' : INK, overflow: 'hidden'}}>
 			{/* Real footage, camera zooms on the subject while paused */}
+			<AbsoluteFill
+				style={
+					variant === 'paper'
+						? {
+								overflow: 'hidden',
+								transform: `scale(${1 - 0.12 * paperK}) rotate(${-2.5 * paperK}deg)`,
+								boxShadow: `0 0 0 ${26 * paperK}px #fbfaf7, 0 ${34 * paperK}px ${90 * paperK}px rgba(0,0,0,${0.35 * paperK})`,
+							}
+						: undefined
+				}
+			>
 			<AbsoluteFill style={{transformOrigin: '0 0', transform: `translate(${ax - fx * s}px, ${ay - fy * s}px) scale(${s})`}}>
 				<Sequence durationInFrames={Math.round(T.freeze * fps)}>
 					<OffthreadVideo src={staticFile(VIDEO.leadInClip)} muted />
 				</Sequence>
 				{paused && (
 					<>
-						<Img src={staticFile(VIDEO.freeze)} style={{position: 'absolute', width: W, height: H, filter: `brightness(${1 - 0.42 * dim}) saturate(${1 - 0.3 * dim}) blur(${4 * dim}px)`}} />
+						<Img src={staticFile(VIDEO.freeze)} style={{position: 'absolute', width: W, height: H, filter: bgFilter(variant, dim)}} />
+						{variant === 'neon' && <NightTint k={dim} />}
+						{variant === 'comics' && <SpeedLines t={t} k={dim} cx={1125} cy={560} inner={330} scale={s} />}
 						<Img
 							src={staticFile(VIDEO.person)}
 							style={{
@@ -205,12 +237,14 @@ export const MotionAd: React.FC<{variant?: Variant}> = ({variant = 'cinema'}) =>
 								filter: `drop-shadow(0 ${18 * dim}px ${26 * dim}px rgba(0,0,0,${0.45 * dim}))`,
 							}}
 						/>
-						<Brackets t={t} box={SUBJECT_BOX} at={T.freeze + 0.12} out={T.ok - 0.1} scale={s} />
+						{!['apple', 'vhs', 'paper'].includes(variant) && <Brackets t={t} box={SUBJECT_BOX} at={T.freeze + 0.12} out={T.ok - 0.1} scale={s} />}
+						{variant === 'vhs' && <TapeGlitch t={t} at={T.freeze} src={staticFile(VIDEO.freeze)} />}
 					</>
 				)}
 				<Sequence from={Math.round(T.resume * fps)}>
 					<OffthreadVideo src={staticFile(VIDEO.clip)} trimBefore={Math.round(VIDEO.freezeAt * fps)} muted />
 				</Sequence>
+			</AbsoluteFill>
 			</AbsoluteFill>
 
 			{isCinema(variant) && paused && (t < T.adStart || t >= T.contract) && <Vignette k={dim} strength={0.45} />}
@@ -231,9 +265,18 @@ export const MotionAd: React.FC<{variant?: Variant}> = ({variant = 'cinema'}) =>
 			{isCinema(variant) && <Letterbox size={variant === 'cinema_film' ? 150 : 110} k={glide(t, T.freeze, 0.5) - glide(t, T.flood, 0.4) + glide(t, T.contract, 0.4) - glide(t, T.resume, 0.5)} />}
 			{variant === 'bubbles' && paused && t < T.adStart && <Bokeh t={t} k={glide(t, T.ok - 0.3, 0.8)} />}
 
+			{variant === 'comics' && paused && (t < T.adStart || t >= T.contract) && <Halftone k={dim} />}
+			{variant === 'comics' && <Burst t={t} at={T.freeze + 0.15} out={T.ok + 0.6} x={330} y={250} word="PAUSE!" />}
+			{variant === 'vhs' && paused && (t < T.adStart || t >= T.contract) && (
+				<>
+					<Scanlines k={dim} />
+					<VhsOsd t={t} k={dim} counter={`0:03:12`} />
+				</>
+			)}
+
 			{/* Glass caption pill */}
 			{paused && t > T.ok - 0.3 && t < T.adStart && (
-				<div style={{position: 'absolute', left: pill.left, top: pill.top, width: pill.w, height: pill.h, borderRadius: pill.r, ...glass(false), transform: `scale(${pillIn})`, overflow: 'hidden'}}>
+				<div style={{position: 'absolute', left: pill.left, top: pill.top, width: pill.w, height: pill.h, borderRadius: pill.r, ...glass(false), transform: `scale(${pillIn})`, overflow: 'hidden', ...(variant === 'neon' ? neonGlow(t, T.ok - 0.3) : {})}}>
 					<Aura t={t} k={0.35 * glide(t, T.ok - 0.2, 0.8) + 0.35 * glide(t, T.andyou - 0.2, 0.6)} />
 					<RimLight t={t} radius={pill.r} />
 					{/* "Okay." */}

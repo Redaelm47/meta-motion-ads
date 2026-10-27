@@ -16,7 +16,7 @@ from pathlib import Path
 
 CHROME = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
 ROOT = Path(__file__).resolve().parent.parent
-NAMES = ["cinema", "cinema_film", "cinema_leak", "cinema_spot", "bubbles"]
+NAMES = ["comics", "vhs", "paper", "neon", "apple"]  # the latest batch; pass names to render others
 FPS = 25
 
 
