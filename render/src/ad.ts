@@ -21,7 +21,7 @@ export const VIDEO = {
 
 export const AD = {
 	video: 'ad/base44.mp4',
-	voice: 'ad/base44_voice.wav', // the ad's voice track, music removed (Demucs)
+	audio: 'ad/base44_full.wav', // the ad's own sound, music included (it's their ad, not ours)
 	duration: 1410 / 25,
 	brand: 'Base44',
 	site: 'base44.com',
@@ -44,26 +44,31 @@ const timed = (key: string, start: number): Word[] => {
 };
 const end = (k: string, start: number) => start + LINES[k].duration;
 
+const FPS = 50;
+const snap = (x: number) => Math.round(x * FPS) / FPS; // cut points sit on whole output frames
+
 const freeze = (VIDEO.freezeAt - VIDEO.leadIn) / VIDEO.leadInRate;
 const gag1 = freeze + 0.3;
-const gag2 = end('gag1', gag1) + 0.12;
+const gag2 = end('gag1', gag1) + 0.15;
 const flood = end('gag2', gag2) + 0.05;
-const adStart = flood + 0.7;
+const adStart = snap(flood + 0.7);
 const adEnd = adStart + AD.duration;
-const back = adEnd + 0.15;
-const playPress = end('back', back) + 0.35;
-const resume = playPress + 0.5;
+const back = adEnd + 0.12;
+const contract = end('back', back) + 0.2;
+const settle = contract + 0.5; // back on the paused video: the camera eases out before it plays again
+const playPress = settle + 0.75;
+const resume = playPress + 0.12;
 
-export const T = {press: 1.12, freeze, gag1, gag2, flood, adStart, adEnd, back, playPress, contract: playPress + 0.06, resume};
+export const T = {press: 1.12, freeze, gag1, gag2, flood, land: flood + 0.64, adStart, adEnd, back, contract, settle, playPress, resume};
 export const VOICE = [
 	{t: gag1, line: LINES.gag1},
 	{t: gag2, line: LINES.gag2},
 	{t: back, line: LINES.back},
 ];
 export const WORDS = {gag1: timed('gag1', gag1), gag2: timed('gag2', gag2), back: timed('back', back)};
-export const TOTAL = resume + (VIDEO.end - VIDEO.freezeAt) + 0.3;
+export const TOTAL = resume + (VIDEO.end - VIDEO.freezeAt) + 0.4;
 /** Parts that move fast enough to need motion blur (rendered with subframes). */
 export const BLUR_RANGES: [number, number][] = [
-	[0, adStart + 0.1],
-	[adEnd - 0.1, TOTAL],
+	[0, adStart],
+	[adEnd, TOTAL],
 ];

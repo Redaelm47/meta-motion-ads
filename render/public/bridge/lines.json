@@ -3,19 +3,39 @@
  "lines": [
   {
    "key": "gag1",
-   "text": "He's motivated!",
+   "text": "Okay... he's really motivated, isn't he?",
    "file": "bridge/gag1.wav",
-   "duration": 0.809,
+   "duration": 1.804,
    "words": [
     {
-     "w": "He's",
+     "w": "Okay",
      "start": 0.0,
-     "end": 0.107
+     "end": 0.298
+    },
+    {
+     "w": "he's",
+     "start": 0.386,
+     "end": 0.573
+    },
+    {
+     "w": "really",
+     "start": 0.573,
+     "end": 0.798
     },
     {
      "w": "motivated",
-     "start": 0.107,
-     "end": 0.957
+     "start": 0.798,
+     "end": 1.298
+    },
+    {
+     "w": "isn't",
+     "start": 1.336,
+     "end": 1.536
+    },
+    {
+     "w": "he",
+     "start": 1.536,
+     "end": 1.948
     }
    ]
   },
@@ -23,40 +43,45 @@
    "key": "gag2",
    "text": "And you?",
    "file": "bridge/gag2.wav",
-   "duration": 0.524,
+   "duration": 0.573,
    "words": [
     {
      "w": "And",
      "start": 0.0,
-     "end": 0.12
+     "end": 0.156
     },
     {
      "w": "you",
-     "start": 0.12,
-     "end": 0.52
+     "start": 0.156,
+     "end": 0.581
     }
    ]
   },
   {
    "key": "back",
-   "text": "Now... his way!",
+   "text": "Alright... where were we?",
    "file": "bridge/back.wav",
-   "duration": 0.75,
+   "duration": 0.961,
    "words": [
     {
-     "w": "Now",
+     "w": "Alright",
      "start": 0.0,
-     "end": 0.135
+     "end": 0.286
     },
     {
-     "w": "his",
-     "start": 0.223,
-     "end": 0.385
+     "w": "where",
+     "start": 0.373,
+     "end": 0.498
     },
     {
-     "w": "way",
-     "start": 0.385,
-     "end": 0.885
+     "w": "were",
+     "start": 0.498,
+     "end": 0.611
+    },
+    {
+     "w": "we",
+     "start": 0.611,
+     "end": 1.011
     }
    ]
   }

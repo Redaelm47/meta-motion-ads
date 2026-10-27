@@ -18,9 +18,9 @@ from kokoro import KPipeline
 SR = 24000
 # The bridge into an existing ad (v3): short, fast, energetic lines; the ad's own voice takes over.
 BRIDGE = [
-    ("gag1", "He's motivated!"),
+    ("gag1", "Okay... he's really motivated, isn't he?"),
     ("gag2", "And you?"),
-    ("back", "Now... his way!"),
+    ("back", "Alright... where were we?"),
 ]
 LINES = [
     ("gag1", "He's motivated."),

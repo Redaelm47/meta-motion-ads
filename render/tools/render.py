@@ -1,10 +1,11 @@
-"""Final render of MotionAd with motion blur only where things move fast.
+"""Render MotionAd fast: only our bridges go through the browser, the ad itself goes through ffmpeg.
 
-The ad in the middle plays as is; our bridges in and out are rendered with 8 subframes per
-frame and blended. The three parts are cut at frame boundaries and joined, audio from the
-plain render, loudness normalised to -14 LUFS.
+    python3 tools/render.py out/draft.mp4 --draft    # half size, 25 fps, no motion blur: about a minute
+    python3 tools/render.py out/motion-ad.mp4        # full size, 50 fps, 8-subframe motion blur on the bridges
 
-    python3 tools/render.py out/motion-ad-v3.mp4
+The middle of the film is the brand's ad, untouched: ffmpeg copies it in and draws the yellow
+ad progress bar, which is real time instead of a browser screenshot per frame. Audio: our
+bridges' sound, the ad's own sound, loudness normalised to -14 LUFS.
 """
 
 import json
@@ -13,56 +14,62 @@ import subprocess
 import sys
 from pathlib import Path
 
-FPS = 50
-SUB = 8
 CHROME = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
 ROOT = Path(__file__).resolve().parent.parent
-OUT = ROOT / "out" / "parts"
+PARTS = ROOT / "out" / "parts"
 
 
-def run(cmd):
-    print("+", " ".join(str(c) for c in cmd[:6]), "...", flush=True)
-    subprocess.run(cmd, cwd=ROOT, check=True)
-
-
-def remotion(out, fps, frames=None, crf=None):
-    if Path(out).exists():  # parts survive a failed run; delete out/parts to start over
-        print("= reuse", out)
-        return
-    cmd = ["npx", "remotion", "render", "src/index.ts", "MotionAd", str(out), f"--props={json.dumps({'fps': fps})}",
-           "--log=error", f"--browser-executable={CHROME}"]
-    if frames:
-        cmd.append(f"--frames={frames[0]}-{frames[1]}")
-    if crf:
-        cmd.append(f"--crf={crf}")
-    run(cmd)
+def run(cmd, **kw):
+    print("+", " ".join(str(c) for c in cmd[:7]), "...", flush=True)
+    return subprocess.run([str(c) for c in cmd], cwd=ROOT, check=True, **kw)
 
 
 def main():
-    final = Path(sys.argv[1] if len(sys.argv) > 1 else "out/motion-ad-v3.mp4")
-    OUT.mkdir(parents=True, exist_ok=True)
-    tl = json.loads(subprocess.run(["npx", "tsx", "tools/timings.ts"], cwd=ROOT, check=True, capture_output=True, text=True).stdout)
-    total = math.floor(tl["total"] * FPS)  # whole frames only, so every output frame has all its subframes
-    (a0, a1), (b0, b1) = tl["blur"]
-    intro_end = math.ceil(a1 * FPS)  # output frames [0, intro_end) come from the blurred intro
-    outro_start = math.floor(b0 * FPS)  # output frames [outro_start, total) from the blurred outro
+    args = [a for a in sys.argv[1:] if not a.startswith("--")]
+    draft = "--draft" in sys.argv
+    final = Path(args[0] if args else ("out/draft.mp4" if draft else "out/motion-ad.mp4"))
+    fps, sub, scale = (25, 1, 0.5) if draft else (50, 8, 1.0)
+    w, h = int(1920 * scale), int(1080 * scale)
 
-    remotion(OUT / "base.mp4", FPS, crf=16)
-    remotion(OUT / "intro.mp4", FPS * SUB, frames=(0, intro_end * SUB - 1), crf=20)
-    remotion(OUT / "outro.mp4", FPS * SUB, frames=(outro_start * SUB, total * SUB - 1), crf=20)
+    tl = json.loads(run(["npx", "tsx", "tools/timings.ts"], capture_output=True, text=True).stdout)
+    a = round(tl["adStart"] * fps)  # output frames [0, a): intro bridge
+    b = a + round(tl["adDuration"] * fps)  # [a, b): the ad; [b, total): outro bridge
+    total = math.floor(tl["total"] * fps)
 
-    # Each output frame k averages subframes 8k .. 8k+7.
-    blur = f"tmix=frames={SUB},select='eq(mod(n\\,{SUB})\\,{SUB - 1})',setpts=N/{FPS}/TB"
+    PARTS.mkdir(parents=True, exist_ok=True)
+    for p in PARTS.iterdir():
+        p.unlink()
+
+    def bridge(name, first, last):
+        run(["npx", "remotion", "render", "src/index.ts", "MotionAd", PARTS / f"{name}.mp4",
+             f"--props={json.dumps({'fps': fps * sub})}", f"--frames={first * sub}-{last * sub - 1}",
+             f"--scale={scale}", "--concurrency=8", "--crf=18", "--log=error", f"--browser-executable={CHROME}"])
+
+    bridge("intro", 0, a)
+    bridge("outro", b, total)
+
+    blur = f"tmix=frames={sub},select='eq(mod(n\\,{sub})\\,{sub - 1})'," if sub > 1 else ""
+    bar = max(2, round(4 * scale))
+    dur = (b - a) / fps
     graph = (
-        f"[0:v]{blur}[a];"
-        f"[1:v]trim=start_frame={intro_end}:end_frame={outro_start},setpts=N/{FPS}/TB[b];"
-        f"[2:v]{blur}[c];"
-        f"[a][b][c]concat=n=3:v=1:a=0[v]"
+        f"[0:v]{blur}setpts=N/{fps}/TB[v0];"
+        f"[1:v]fps={fps},scale={w}:{h},trim=end_frame={b - a},setpts=N/{fps}/TB,"
+        f"drawbox=x=0:y=ih-{bar}:w=iw:h={bar}:color=white@0.25:t=fill[ad];"
+        f"color=c=0xffcc00:s={w}x{bar}:r={fps}:d={dur}[y];"
+        f"[ad][y]overlay=x='-W+W*t/{dur}':y=H-{bar}:shortest=1[v1];"
+        f"[2:v]{blur}setpts=N/{fps}/TB[v2];"
+        f"[v0][v1][v2]concat=n=3:v=1:a=0[v];"
+        f"[0:a]apad,atrim=0:{a / fps},asetpts=N/SR/TB[a0];"
+        f"[3:a]aresample=48000,apad,atrim=0:{dur},asetpts=N/SR/TB[a1];"
+        f"[2:a]apad,atrim=0:{(total - b) / fps},asetpts=N/SR/TB[a2];"
+        f"[a0][a1][a2]concat=n=3:v=0:a=1,loudnorm=I=-14:TP=-1.5:LRA=11[a]"
     )
-    run(["ffmpeg", "-loglevel", "error", "-y", "-i", OUT / "intro.mp4", "-i", OUT / "base.mp4", "-i", OUT / "outro.mp4",
-         "-filter_complex", graph, "-map", "[v]", "-map", "1:a", "-af", "loudnorm=I=-14:TP=-1.5:LRA=11",
-         "-r", str(FPS), "-c:v", "libx264", "-crf", "17", "-pix_fmt", "yuv420p", "-c:a", "aac", "-b:a", "192k", "-ar", "48000", "-shortest", final])
-    for p in OUT.iterdir():
+    run(["ffmpeg", "-loglevel", "error", "-y",
+         "-i", PARTS / "intro.mp4", "-i", f"public/{tl['adVideo']}", "-i", PARTS / "outro.mp4", "-i", f"public/{tl['adAudio']}",
+         "-filter_complex", graph, "-map", "[v]", "-map", "[a]", "-r", fps,
+         "-c:v", "libx264", "-preset", "veryfast" if draft else "medium", "-crf", 23 if draft else 17, "-pix_fmt", "yuv420p",
+         "-c:a", "aac", "-b:a", "192k", "-ar", "48000", final])
+    for p in PARTS.iterdir():
         p.unlink()
     print("done:", final)
 
