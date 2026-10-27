@@ -12,6 +12,31 @@ BRIDGE = [  # one chunk per breath; the pauses between them are placed in render
     ("alright", "Alright."),
     ("where", "Where were we?"),
 ]
+# Lines for the other bridge templates (render/src/templates). Same rule: one chunk per breath.
+SETS = {
+    "bridge": BRIDGE,
+    # Replay (sports broadcast): rewind, slow motion, a sponsor slate. The ad opens on "You".
+    "replay": [
+        ("wait", "Wait, wait, wait."),
+        ("again", "Let's see that again."),
+        ("look", "Look at that!"),
+        ("brought", "This replay is brought to you by..."),
+        ("back", "Back to the action!"),
+    ],
+    # Gag, another way back: the narrator lets him jump (a payoff instead of "Where were we?").
+    "gag_out": [
+        ("okay2", "Okay."),
+        ("nowjump", "Now jump."),
+    ],
+    # Thought (inner voice): a thought bubble, the idea is the ad.
+    "thought": [
+        ("hmm", "Hmm..."),
+        ("whatif", "What if I just..."),
+        ("built", "built an app instead?"),
+        ("nah", "Nah."),
+        ("jump", "Jump first."),
+    ],
+}
 LINES = [
     ("gag1", "He's motivated."),
     ("gag2", "And you?"),

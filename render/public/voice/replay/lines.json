@@ -1,0 +1,150 @@
+{
+ "voice": "chatterbox",
+ "lines": [
+  {
+   "key": "wait",
+   "text": "Wait, wait, wait.",
+   "file": "voice/replay/wait.wav",
+   "duration": 0.669,
+   "words": [
+    {
+     "w": "Wait,",
+     "start": 0.0,
+     "end": 0.223
+    },
+    {
+     "w": "wait,",
+     "start": 0.223,
+     "end": 0.446
+    },
+    {
+     "w": "wait.",
+     "start": 0.446,
+     "end": 0.669
+    }
+   ]
+  },
+  {
+   "key": "again",
+   "text": "Let's see that again.",
+   "file": "voice/replay/again.wav",
+   "duration": 1.192,
+   "words": [
+    {
+     "w": "Let's",
+     "start": 0.0,
+     "end": 0.331
+    },
+    {
+     "w": "see",
+     "start": 0.331,
+     "end": 0.53
+    },
+    {
+     "w": "that",
+     "start": 0.53,
+     "end": 0.795
+    },
+    {
+     "w": "again.",
+     "start": 0.795,
+     "end": 1.192
+    }
+   ]
+  },
+  {
+   "key": "look",
+   "text": "Look at that!",
+   "file": "voice/replay/look.wav",
+   "duration": 0.711,
+   "words": [
+    {
+     "w": "Look",
+     "start": 0.0,
+     "end": 0.258
+    },
+    {
+     "w": "at",
+     "start": 0.258,
+     "end": 0.388
+    },
+    {
+     "w": "that!",
+     "start": 0.388,
+     "end": 0.711
+    }
+   ]
+  },
+  {
+   "key": "brought",
+   "text": "This replay is brought to you by...",
+   "file": "voice/replay/brought.wav",
+   "duration": 2.851,
+   "words": [
+    {
+     "w": "This",
+     "start": 0.0,
+     "end": 0.393
+    },
+    {
+     "w": "replay",
+     "start": 0.393,
+     "end": 0.983
+    },
+    {
+     "w": "is",
+     "start": 0.983,
+     "end": 1.18
+    },
+    {
+     "w": "brought",
+     "start": 1.18,
+     "end": 1.868
+    },
+    {
+     "w": "to",
+     "start": 1.868,
+     "end": 2.064
+    },
+    {
+     "w": "you",
+     "start": 2.064,
+     "end": 2.359
+    },
+    {
+     "w": "by...",
+     "start": 2.359,
+     "end": 2.851
+    }
+   ]
+  },
+  {
+   "key": "back",
+   "text": "Back to the action!",
+   "file": "voice/replay/back.wav",
+   "duration": 0.921,
+   "words": [
+    {
+     "w": "Back",
+     "start": 0.0,
+     "end": 0.23
+    },
+    {
+     "w": "to",
+     "start": 0.23,
+     "end": 0.345
+    },
+    {
+     "w": "the",
+     "start": 0.345,
+     "end": 0.518
+    },
+    {
+     "w": "action!",
+     "start": 0.518,
+     "end": 0.921
+    }
+   ]
+  }
+ ]
+}

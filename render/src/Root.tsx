@@ -6,6 +6,10 @@ import {TOTAL as TOTAL_V2} from './adV2';
 import {MotionAd} from './MotionAd';
 import {MotionAdV1} from './MotionAdV1';
 import {MotionAdV2} from './MotionAdV2';
+import {Hush, TL as HUSH} from './templates/Hush';
+import {Replay, TL as REPLAY} from './templates/Replay';
+import {Squeeze, TL as SQUEEZE} from './templates/Squeeze';
+import {Thought, TL as THOUGHT} from './templates/Thought';
 
 type Props = {fps: number; variant?: string};
 
@@ -15,11 +19,15 @@ const comp = (id: string, component: React.FC, total: number, fps: number) => (
 	<Composition id={id} component={component as React.FC<Props>} width={1920} height={1080} fps={fps} durationInFrames={Math.ceil(total * fps)} defaultProps={{fps, variant: 'cinema'}} calculateMetadata={meta(total)} />
 );
 
-// MotionAd: bridge into an existing ad (v3, 50 fps to match the ad's 25 fps).
+// MotionAd: the "gag" bridge template (v3). The other templates of the panel: src/templates/catalog.ts.
 // MotionAdV2: our own generated ad. MotionAdV1: first gag test.
 export const Root: React.FC = () => (
 	<>
 		{comp('MotionAd', MotionAd, TOTAL, 50)}
+		{comp('Replay', Replay, REPLAY.total, 50)}
+		{comp('Thought', Thought, THOUGHT.total, 50)}
+		{comp('Squeeze', Squeeze, SQUEEZE.total, 50)}
+		{comp('Hush', Hush, HUSH.total, 50)}
 		{comp('MotionAdV2', MotionAdV2, TOTAL_V2, 60)}
 		{comp('MotionAdV1', MotionAdV1, TOTAL_V1, 60)}
 	</>

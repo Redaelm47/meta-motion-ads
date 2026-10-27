@@ -1,0 +1,36 @@
+{
+ "voice": "chatterbox",
+ "lines": [
+  {
+   "key": "okay2",
+   "text": "Okay.",
+   "file": "voice/gag_out/okay2.wav",
+   "duration": 1.181,
+   "words": [
+    {
+     "w": "Okay.",
+     "start": 0.0,
+     "end": 1.181
+    }
+   ]
+  },
+  {
+   "key": "nowjump",
+   "text": "Now jump.",
+   "file": "voice/gag_out/nowjump.wav",
+   "duration": 0.602,
+   "words": [
+    {
+     "w": "Now",
+     "start": 0.0,
+     "end": 0.226
+    },
+    {
+     "w": "jump.",
+     "start": 0.226,
+     "end": 0.602
+    }
+   ]
+  }
+ ]
+}

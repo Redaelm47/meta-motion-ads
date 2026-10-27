@@ -1,0 +1,105 @@
+{
+ "voice": "chatterbox",
+ "lines": [
+  {
+   "key": "hmm",
+   "text": "Hmm...",
+   "file": "voice/thought/hmm.wav",
+   "duration": 1.029,
+   "words": [
+    {
+     "w": "Hmm...",
+     "start": 0.0,
+     "end": 1.029
+    }
+   ]
+  },
+  {
+   "key": "whatif",
+   "text": "What if I just...",
+   "file": "voice/thought/whatif.wav",
+   "duration": 0.889,
+   "words": [
+    {
+     "w": "What",
+     "start": 0.0,
+     "end": 0.254
+    },
+    {
+     "w": "if",
+     "start": 0.254,
+     "end": 0.381
+    },
+    {
+     "w": "I",
+     "start": 0.381,
+     "end": 0.444
+    },
+    {
+     "w": "just...",
+     "start": 0.444,
+     "end": 0.889
+    }
+   ]
+  },
+  {
+   "key": "built",
+   "text": "built an app instead?",
+   "file": "voice/thought/built.wav",
+   "duration": 1.262,
+   "words": [
+    {
+     "w": "built",
+     "start": 0.0,
+     "end": 0.351
+    },
+    {
+     "w": "an",
+     "start": 0.351,
+     "end": 0.491
+    },
+    {
+     "w": "app",
+     "start": 0.491,
+     "end": 0.701
+    },
+    {
+     "w": "instead?",
+     "start": 0.701,
+     "end": 1.262
+    }
+   ]
+  },
+  {
+   "key": "nah",
+   "text": "Nah.",
+   "file": "voice/thought/nah.wav",
+   "duration": 0.558,
+   "words": [
+    {
+     "w": "Nah.",
+     "start": 0.0,
+     "end": 0.558
+    }
+   ]
+  },
+  {
+   "key": "jump",
+   "text": "Jump first.",
+   "file": "voice/thought/jump.wav",
+   "duration": 1.24,
+   "words": [
+    {
+     "w": "Jump",
+     "start": 0.0,
+     "end": 0.496
+    },
+    {
+     "w": "first.",
+     "start": 0.496,
+     "end": 1.24
+    }
+   ]
+  }
+ ]
+}
