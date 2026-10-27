@@ -66,6 +66,34 @@ SETS = {
         ("wall", "The wall is not impressed."),
         ("resumes", "Nature resumes."),
     ],
+    # More thoughts (inner voice, --exaggeration 0.45 --cfg 0.5): an idea born mid-jump, leading to "an app".
+    "thought_land": [
+        ("note", "Note to self:"),
+        ("app", "an app that tells me"),
+        ("land", "where to land."),
+        ("later", "Later."),
+        ("landing", "Landing first."),
+    ],
+    "thought_plan": [
+        ("midair", "Mid-air."),
+        ("noplan", "No plan."),
+        ("ifonly", "If only there was"),
+        ("appfor", "an app for this..."),
+        ("okay", "Okay."),
+        ("planb", "Plan B: jump."),
+    ],
+    # Billboard with a voice (narrator, expressive like the gag).
+    "bb_look": [
+        ("wait", "Wait..."),
+        ("look", "Look at that."),
+        ("anyway", "Anyway."),
+    ],
+    "bb_behind": [
+        ("psst", "Psst."),
+        ("behind", "Behind you."),
+        ("okay", "Okay."),
+        ("eyes", "Eyes front."),
+    ],
     # Thought (inner voice): a thought bubble, the idea is the ad.
     "thought": [
         ("hmm", "Hmm..."),

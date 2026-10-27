@@ -1,0 +1,115 @@
+{
+ "voice": "chatterbox",
+ "lines": [
+  {
+   "key": "note",
+   "text": "Note to self:",
+   "file": "voice/thought_land/note.wav",
+   "duration": 0.955,
+   "words": [
+    {
+     "w": "Note",
+     "start": 0.0,
+     "end": 0.347
+    },
+    {
+     "w": "to",
+     "start": 0.347,
+     "end": 0.521
+    },
+    {
+     "w": "self:",
+     "start": 0.521,
+     "end": 0.955
+    }
+   ]
+  },
+  {
+   "key": "app",
+   "text": "an app that tells me",
+   "file": "voice/thought_land/app.wav",
+   "duration": 0.908,
+   "words": [
+    {
+     "w": "an",
+     "start": 0.0,
+     "end": 0.113
+    },
+    {
+     "w": "app",
+     "start": 0.113,
+     "end": 0.284
+    },
+    {
+     "w": "that",
+     "start": 0.284,
+     "end": 0.511
+    },
+    {
+     "w": "tells",
+     "start": 0.511,
+     "end": 0.794
+    },
+    {
+     "w": "me",
+     "start": 0.794,
+     "end": 0.908
+    }
+   ]
+  },
+  {
+   "key": "land",
+   "text": "where to land.",
+   "file": "voice/thought_land/land.wav",
+   "duration": 0.91,
+   "words": [
+    {
+     "w": "where",
+     "start": 0.0,
+     "end": 0.379
+    },
+    {
+     "w": "to",
+     "start": 0.379,
+     "end": 0.531
+    },
+    {
+     "w": "land.",
+     "start": 0.531,
+     "end": 0.91
+    }
+   ]
+  },
+  {
+   "key": "later",
+   "text": "Later.",
+   "file": "voice/thought_land/later.wav",
+   "duration": 0.479,
+   "words": [
+    {
+     "w": "Later.",
+     "start": 0.0,
+     "end": 0.479
+    }
+   ]
+  },
+  {
+   "key": "landing",
+   "text": "Landing first.",
+   "file": "voice/thought_land/landing.wav",
+   "duration": 0.91,
+   "words": [
+    {
+     "w": "Landing",
+     "start": 0.0,
+     "end": 0.49
+    },
+    {
+     "w": "first.",
+     "start": 0.49,
+     "end": 0.91
+    }
+   ]
+  }
+ ]
+}

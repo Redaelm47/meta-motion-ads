@@ -1,7 +1,7 @@
 // Billboard: the ad lives in the video's own world. On pause, a flat surface of the scene (here the
 // black tarp on the fence behind him) lights up like a stadium LED board showing the ad's first
 // frame, then the camera dives into it until the board is the screen: the ad starts. Back: the
-// camera pulls out of the board, it switches off, play. No voice. Needs a flat surface in the frame
+// camera pulls out of the board, it switches off, play. Silent, or with a narrator line (LINES). Needs a flat surface in the frame
 // (found by Muse Spark, segmented by SAM 3.1 in the product); here it is measured by hand.
 
 import React from 'react';
@@ -9,9 +9,12 @@ import {AbsoluteFill, Audio, Img, OffthreadVideo, Sequence, staticFile, useCurre
 import {AD, T as GAG, VIDEO} from '../ad';
 import {Ripple} from '../details';
 import {H, PLAY_BTN, Player, SHOWN, W, SourceFrame} from '../kit';
-import {QUICK, clamp01, glide, glides, lerp, pulse} from '../motion';
-import {Cursor, INK} from '../ui';
-import {snap} from './voice';
+import {QUICK, clamp01, glide, glides, lerp, morphGlide, pulse, step} from '../motion';
+import {textWidth} from '../textWidth';
+import {Cursor, INK, WHITE, Word, Words, fontFamily, glass} from '../ui';
+import look from '../../public/voice/bb_look/lines.json';
+import behind from '../../public/voice/bb_behind/lines.json';
+import {snap, voiceSet} from './voice';
 
 // The board: 16:9, on the left tarp panel (source-frame coordinates). The lamp post stands in front.
 const BOARD = {x: 608, y: 450, w: 290, h: (290 * 9) / 16};
@@ -21,36 +24,88 @@ const POLE = {x: 736, w: 18, y: 380, h: 300};
 
 const press = GAG.press;
 const freeze = GAG.freeze;
-const on = freeze + 0.75;
-const dive = on + 1.15;
 const DIVE_D = 1.25;
-const adStart = snap(dive + DIVE_D);
-const adEnd = adStart + AD.duration;
-const pull = adEnd + 0.35;
-const off = pull + DIVE_D + 0.5;
-const settle = off + 0.4;
-const playPress = settle + 0.45;
-const resume = playPress + 0.12;
-export const TL = {adStart, adEnd, resume, total: resume + (VIDEO.end - VIDEO.freezeAt) + 0.4};
 
-const sourceSeconds = (t: number) => (t < freeze ? VIDEO.leadIn + t * VIDEO.leadInRate : t < resume ? VIDEO.freezeAt : VIDEO.freezeAt + (t - resume));
+// Spoken versions (Reda: "on ne dit rien", e.g. "Look at that"): a narrator line, the board
+// switching on with it, a line on the way back. `on` is where in the line the board lights up.
+type Line = [key: string, gapAfter: number];
+const LINES: Record<string, {voice: Parameters<typeof voiceSet>[0]; in: Line[]; onAt: number; out: Line[]}> = {
+	look: {voice: look, in: [['wait', 0.35], ['look', 0.6]], onAt: -0.05, out: [['anyway', 0.25]]},
+	behind: {voice: behind, in: [['psst', 0.3], ['behind', 0.6]], onAt: 0.2, out: [['okay', 0.25], ['eyes', 0.2]]},
+};
 
-const SFX = [
+export const timeline = (name?: string) => {
+	const script = name ? LINES[name] : null;
+	const V = script ? voiceSet(script.voice) : null;
+	const cues: {key: string; t: number; words: Word[]; file: string}[] = [];
+	let at = freeze + 0.5;
+	const cue = ([key, gap]: Line) => {
+		const c = {key, t: at, words: V!.words(key, at), file: V!.line(key).file};
+		cues.push(c);
+		at = V!.end(key, at) + gap;
+		return c;
+	};
+	const ins = script ? script.in.map(cue) : [];
+	const on = script ? ins[ins.length - 1].t + script.onAt : freeze + 0.75;
+	const dive = script ? at : on + 1.15;
+	const adStart = snap(dive + DIVE_D);
+	const adEnd = adStart + AD.duration;
+	const pull = adEnd + 0.35;
+	at = pull + DIVE_D + 0.15;
+	const outs = script ? script.out.map(cue) : [];
+	const off = script ? at + 0.1 : pull + DIVE_D + 0.5;
+	const settle = off + 0.4;
+	const playPress = settle + 0.45;
+	const resume = playPress + 0.12;
+	return {on, dive, adStart, adEnd, pull, off, settle, playPress, resume, ins, outs, cues, total: resume + (VIDEO.end - VIDEO.freezeAt) + 0.4};
+};
+export const TL = timeline();
+export const TLS = Object.fromEntries(Object.keys(LINES).map((k) => [k, timeline(k)]));
+
+const sourceSeconds = (t: number, resume: number) => (t < freeze ? VIDEO.leadIn + t * VIDEO.leadInRate : t < resume ? VIDEO.freezeAt : VIDEO.freezeAt + (t - resume));
+
+const sfxFor = (L: ReturnType<typeof timeline>) => [
 	{t: press, src: 'kenney-click_002.ogg', volume: 0.2},
 	{t: freeze, src: 'kenney-impactSoft_heavy_000.ogg', volume: 0.25},
-	{t: on, src: 'kenney-switch1.ogg', volume: 0.4},
-	{t: on + 0.05, src: 'kenney-glass_002.ogg', volume: 0.12},
-	{t: dive, src: 'mixkit-1492.mp3', volume: 0.3},
-	{t: pull, src: 'mixkit-1492.mp3', volume: 0.25},
-	{t: off, src: 'kenney-switch2.ogg', volume: 0.35},
-	{t: playPress, src: 'kenney-click_002.ogg', volume: 0.2},
+	{t: L.on, src: 'kenney-switch1.ogg', volume: 0.4},
+	{t: L.on + 0.05, src: 'kenney-glass_002.ogg', volume: 0.12},
+	{t: L.dive, src: 'mixkit-1492.mp3', volume: 0.3},
+	{t: L.pull, src: 'mixkit-1492.mp3', volume: 0.25},
+	{t: L.off, src: 'kenney-switch2.ogg', volume: 0.35},
+	{t: L.playPress, src: 'kenney-click_002.ogg', volume: 0.2},
 ];
 
-export const Billboard: React.FC = () => {
+// The narrator's caption: a glass pill above the board, sized to its words.
+const CAP = {left: 560, cy: 330, h: 96, font: 44, pad: 40};
+const Caption: React.FC<{t: number; lines: {t: number; words: Word[]}[]; out: number}> = ({t, lines, out}) => {
+	if (!lines.length || t < lines[0].t - 0.2 || t > out + 0.5) return null;
+	const text = (ls: {words: Word[]}[]) => ls.flatMap((l) => l.words).map((w) => w.w).join(' ');
+	const box = morphGlide(t, [
+		{t: lines[0].t - 0.2, cx: CAP.left + 20, cy: CAP.cy, w: 40, h: 40, r: 20},
+		...lines.map((l, i) => {
+			const w = 2 * CAP.pad + textWidth(text(lines.slice(0, i + 1)), CAP.font, -0.02);
+			return {t: l.t - (i ? 0.12 : 0.15), cx: CAP.left + w / 2, cy: CAP.cy, w, h: CAP.h, r: CAP.h / 2};
+		}),
+	], 0.42, 0.6);
+	const k = step(t - (lines[0].t - 0.2), {response: 0.38, damping: 0.78}) * (1 - glide(t, out, 0.3));
+	return (
+		<div style={{position: 'absolute', left: box.left, top: box.top, width: box.w, height: box.h, borderRadius: Math.min(box.w, box.h) / 2, ...glass(false), transform: `scale(${k})`, overflow: 'hidden'}}>
+			<div style={{position: 'absolute', left: CAP.pad, top: 0, height: CAP.h, display: 'flex', alignItems: 'center', fontFamily, fontWeight: 600, fontSize: CAP.font, letterSpacing: '-0.02em', color: WHITE, whiteSpace: 'pre', textShadow: '0 1px 12px rgba(0,0,0,0.2)'}}>
+				<span>
+					<Words t={t} words={lines.flatMap((l) => l.words)} />
+				</span>
+			</div>
+		</div>
+	);
+};
+
+export const Billboard: React.FC<{line?: string}> = ({line}) => {
 	const frame = useCurrentFrame();
 	const {fps} = useVideoConfig();
 	const t = frame / fps;
 	const tf = Math.floor(t * 50) / 50;
+	const L = line ? TLS[line] : TL;
+	const {on, dive, adStart, adEnd, pull, off, settle, playPress, resume} = L;
 	const paused = t >= freeze && t < resume;
 
 	// Camera: u = 0 the frame as shot, u = 1 inside the board. Zoom in log space, so the dive keeps speed.
@@ -112,12 +167,19 @@ export const Billboard: React.FC = () => {
 				)}
 			</AbsoluteFill>
 
-			<Player controls={clamp01(controls)} progress={clamp01((SHOWN.at + sourceSeconds(tf)) / SHOWN.length)} paused={paused} press={pressK} time={SHOWN.at + sourceSeconds(tf)} length={SHOWN.length} />
+			<Caption t={t} lines={L.ins} out={dive + 0.1} />
+			<Caption t={t} lines={L.outs} out={off} />
+			<Player controls={clamp01(controls)} progress={clamp01((SHOWN.at + sourceSeconds(tf, resume)) / SHOWN.length)} paused={paused} press={pressK} time={SHOWN.at + sourceSeconds(tf, resume)} length={SHOWN.length} />
 			<Ripple t={t} at={press} x={PLAY_BTN.x} y={PLAY_BTN.y} />
 			<Ripple t={t} at={playPress} x={PLAY_BTN.x} y={PLAY_BTN.y} />
 			<Cursor x={cx} y={cy} press={pressK} />
 
-			{SFX.map((e, i) => (
+			{L.cues.map((c) => (
+				<Sequence key={c.key + c.t} from={Math.round(c.t * fps)}>
+					<Audio src={staticFile(c.file)} />
+				</Sequence>
+			))}
+			{sfxFor(L).map((e, i) => (
 				<Sequence key={i} from={Math.round(e.t * fps)}>
 					<Audio src={staticFile(`sfx/${e.src}`)} volume={e.volume} />
 				</Sequence>

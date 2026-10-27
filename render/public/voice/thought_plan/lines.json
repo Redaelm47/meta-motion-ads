@@ -1,0 +1,128 @@
+{
+ "voice": "chatterbox",
+ "lines": [
+  {
+   "key": "midair",
+   "text": "Mid-air.",
+   "file": "voice/thought_plan/midair.wav",
+   "duration": 0.674,
+   "words": [
+    {
+     "w": "Mid-air.",
+     "start": 0.0,
+     "end": 0.674
+    }
+   ]
+  },
+  {
+   "key": "noplan",
+   "text": "No plan.",
+   "file": "voice/thought_plan/noplan.wav",
+   "duration": 0.844,
+   "words": [
+    {
+     "w": "No",
+     "start": 0.0,
+     "end": 0.241
+    },
+    {
+     "w": "plan.",
+     "start": 0.241,
+     "end": 0.844
+    }
+   ]
+  },
+  {
+   "key": "ifonly",
+   "text": "If only there was",
+   "file": "voice/thought_plan/ifonly.wav",
+   "duration": 1.26,
+   "words": [
+    {
+     "w": "If",
+     "start": 0.0,
+     "end": 0.18
+    },
+    {
+     "w": "only",
+     "start": 0.18,
+     "end": 0.54
+    },
+    {
+     "w": "there",
+     "start": 0.54,
+     "end": 0.99
+    },
+    {
+     "w": "was",
+     "start": 0.99,
+     "end": 1.26
+    }
+   ]
+  },
+  {
+   "key": "appfor",
+   "text": "an app for this...",
+   "file": "voice/thought_plan/appfor.wav",
+   "duration": 0.972,
+   "words": [
+    {
+     "w": "an",
+     "start": 0.0,
+     "end": 0.13
+    },
+    {
+     "w": "app",
+     "start": 0.13,
+     "end": 0.324
+    },
+    {
+     "w": "for",
+     "start": 0.324,
+     "end": 0.519
+    },
+    {
+     "w": "this...",
+     "start": 0.519,
+     "end": 0.972
+    }
+   ]
+  },
+  {
+   "key": "okay",
+   "text": "Okay.",
+   "file": "voice/thought_plan/okay.wav",
+   "duration": 0.64,
+   "words": [
+    {
+     "w": "Okay.",
+     "start": 0.0,
+     "end": 0.64
+    }
+   ]
+  },
+  {
+   "key": "planb",
+   "text": "Plan B: jump.",
+   "file": "voice/thought_plan/planb.wav",
+   "duration": 1.295,
+   "words": [
+    {
+     "w": "Plan",
+     "start": 0.0,
+     "end": 0.471
+    },
+    {
+     "w": "B:",
+     "start": 0.471,
+     "end": 0.706
+    },
+    {
+     "w": "jump.",
+     "start": 0.706,
+     "end": 1.295
+    }
+   ]
+  }
+ ]
+}

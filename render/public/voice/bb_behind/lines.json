@@ -1,0 +1,67 @@
+{
+ "voice": "chatterbox",
+ "lines": [
+  {
+   "key": "psst",
+   "text": "Psst.",
+   "file": "voice/bb_behind/psst.wav",
+   "duration": 1.021,
+   "words": [
+    {
+     "w": "Psst.",
+     "start": 0.0,
+     "end": 1.021
+    }
+   ]
+  },
+  {
+   "key": "behind",
+   "text": "Behind you.",
+   "file": "voice/bb_behind/behind.wav",
+   "duration": 0.61,
+   "words": [
+    {
+     "w": "Behind",
+     "start": 0.0,
+     "end": 0.366
+    },
+    {
+     "w": "you.",
+     "start": 0.366,
+     "end": 0.61
+    }
+   ]
+  },
+  {
+   "key": "okay",
+   "text": "Okay.",
+   "file": "voice/bb_behind/okay.wav",
+   "duration": 1.181,
+   "words": [
+    {
+     "w": "Okay.",
+     "start": 0.0,
+     "end": 1.181
+    }
+   ]
+  },
+  {
+   "key": "eyes",
+   "text": "Eyes front.",
+   "file": "voice/bb_behind/eyes.wav",
+   "duration": 0.78,
+   "words": [
+    {
+     "w": "Eyes",
+     "start": 0.0,
+     "end": 0.312
+    },
+    {
+     "w": "front.",
+     "start": 0.312,
+     "end": 0.78
+    }
+   ]
+  }
+ ]
+}

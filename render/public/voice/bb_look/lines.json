@@ -1,0 +1,54 @@
+{
+ "voice": "chatterbox",
+ "lines": [
+  {
+   "key": "wait",
+   "text": "Wait...",
+   "file": "voice/bb_look/wait.wav",
+   "duration": 0.46,
+   "words": [
+    {
+     "w": "Wait...",
+     "start": 0.0,
+     "end": 0.46
+    }
+   ]
+  },
+  {
+   "key": "look",
+   "text": "Look at that.",
+   "file": "voice/bb_look/look.wav",
+   "duration": 0.452,
+   "words": [
+    {
+     "w": "Look",
+     "start": 0.0,
+     "end": 0.164
+    },
+    {
+     "w": "at",
+     "start": 0.164,
+     "end": 0.247
+    },
+    {
+     "w": "that.",
+     "start": 0.247,
+     "end": 0.452
+    }
+   ]
+  },
+  {
+   "key": "anyway",
+   "text": "Anyway.",
+   "file": "voice/bb_look/anyway.wav",
+   "duration": 0.409,
+   "words": [
+    {
+     "w": "Anyway.",
+     "start": 0.0,
+     "end": 0.409
+    }
+   ]
+  }
+ ]
+}
