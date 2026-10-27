@@ -1,0 +1,231 @@
+{
+ "voice": "am_michael",
+ "lines": [
+  {
+   "key": "gag1",
+   "text": "He's motivated.",
+   "file": "voice/gag1.wav",
+   "duration": 1.091,
+   "words": [
+    {
+     "w": "He's",
+     "start": 0.0,
+     "end": 0.312
+    },
+    {
+     "w": "motivated",
+     "start": 0.312,
+     "end": 1.274
+    }
+   ]
+  },
+  {
+   "key": "gag2",
+   "text": "And you?",
+   "file": "voice/gag2.wav",
+   "duration": 0.702,
+   "words": [
+    {
+     "w": "And",
+     "start": 0.004,
+     "end": 0.317
+    },
+    {
+     "w": "you",
+     "start": 0.317,
+     "end": 0.804
+    }
+   ]
+  },
+  {
+   "key": "hook",
+   "text": "Motivated enough to finally launch your own website?",
+   "file": "voice/hook.wav",
+   "duration": 2.779,
+   "words": [
+    {
+     "w": "Motivated",
+     "start": 0.005,
+     "end": 0.518
+    },
+    {
+     "w": "enough",
+     "start": 0.518,
+     "end": 0.805
+    },
+    {
+     "w": "to",
+     "start": 0.805,
+     "end": 0.943
+    },
+    {
+     "w": "finally",
+     "start": 0.943,
+     "end": 1.418
+    },
+    {
+     "w": "launch",
+     "start": 1.418,
+     "end": 1.78
+    },
+    {
+     "w": "your",
+     "start": 1.78,
+     "end": 1.968
+    },
+    {
+     "w": "own",
+     "start": 1.968,
+     "end": 2.255
+    },
+    {
+     "w": "website",
+     "start": 2.255,
+     "end": 3.155
+    }
+   ]
+  },
+  {
+   "key": "ask",
+   "text": "With Nova, just say what you want...",
+   "file": "voice/ask.wav",
+   "duration": 1.892,
+   "words": [
+    {
+     "w": "With",
+     "start": 0.0,
+     "end": 0.188
+    },
+    {
+     "w": "Nova",
+     "start": 0.188,
+     "end": 0.663
+    },
+    {
+     "w": "just",
+     "start": 0.738,
+     "end": 0.913
+    },
+    {
+     "w": "say",
+     "start": 0.913,
+     "end": 1.113
+    },
+    {
+     "w": "what",
+     "start": 1.113,
+     "end": 1.263
+    },
+    {
+     "w": "you",
+     "start": 1.263,
+     "end": 1.426
+    },
+    {
+     "w": "want",
+     "start": 1.426,
+     "end": 2.138
+    }
+   ]
+  },
+  {
+   "key": "build",
+   "text": "and watch it build itself.",
+   "file": "voice/build.wav",
+   "duration": 1.507,
+   "words": [
+    {
+     "w": "and",
+     "start": 0.0,
+     "end": 0.138
+    },
+    {
+     "w": "watch",
+     "start": 0.138,
+     "end": 0.45
+    },
+    {
+     "w": "it",
+     "start": 0.45,
+     "end": 0.613
+    },
+    {
+     "w": "build",
+     "start": 0.613,
+     "end": 0.888
+    },
+    {
+     "w": "itself",
+     "start": 0.888,
+     "end": 1.725
+    }
+   ]
+  },
+  {
+   "key": "live",
+   "text": "Your site. Live in five minutes.",
+   "file": "voice/live.wav",
+   "duration": 1.92,
+   "words": [
+    {
+     "w": "Your",
+     "start": 0.003,
+     "end": 0.178
+    },
+    {
+     "w": "site",
+     "start": 0.178,
+     "end": 0.578
+    },
+    {
+     "w": "Live",
+     "start": 0.666,
+     "end": 0.891
+    },
+    {
+     "w": "in",
+     "start": 0.891,
+     "end": 1.041
+    },
+    {
+     "w": "five",
+     "start": 1.041,
+     "end": 1.403
+    },
+    {
+     "w": "minutes",
+     "start": 1.403,
+     "end": 2.128
+    }
+   ]
+  },
+  {
+   "key": "end",
+   "text": "Nova. Try it free.",
+   "file": "voice/end.wav",
+   "duration": 1.269,
+   "words": [
+    {
+     "w": "Nova",
+     "start": 0.044,
+     "end": 0.369
+    },
+    {
+     "w": "Try",
+     "start": 0.419,
+     "end": 0.681
+    },
+    {
+     "w": "it",
+     "start": 0.681,
+     "end": 0.831
+    },
+    {
+     "w": "free",
+     "start": 0.831,
+     "end": 1.519
+    }
+   ]
+  }
+ ]
+}

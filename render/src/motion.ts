@@ -1,3 +1,5 @@
+import {Easing} from 'remotion';
+
 // Every animated value is a pure function of time (seconds), so any frame can be rendered alone
 // and the composition can run at any frame rate (60 fps preview, 240 fps for motion blur).
 
@@ -66,3 +68,36 @@ export const morph = (t: number, boxes: Box[]) => {
 /** Visibility of content that swaps inside a morphing container: enters a bit late, leaves fast. */
 export const presence = (t: number, enter: number, exit = Infinity) =>
 	Math.max(0, Math.min(1, step(t - enter - 0.06, SOFT) - step(t - exit, QUICK)));
+
+/** The one curve every morph glides on. */
+export const EASE = Easing.bezier(0.45, 0, 0.15, 1);
+export const clamp01 = (x: number) => Math.max(0, Math.min(1, x));
+export const glide = (t: number, t0: number, dur = 0.8) => EASE(clamp01((t - t0) / dur));
+
+/** A value with several targets, each change gliding on the shared curve. */
+export const glides = (t: number, keys: {t: number; v: number; d?: number}[]) => {
+	let v = keys[0].v;
+	for (let i = 1; i < keys.length; i++) v += (keys[i].v - keys[i - 1].v) * glide(t, keys[i].t, keys[i].d ?? 0.8);
+	return v;
+};
+
+/** Same as `morph`, on glides: the leading edge takes `lead` seconds, the trailing one `trail`. */
+export const morphGlide = (t: number, boxes: Omit<Box, 'light'>[], lead = 0.6, trail = 0.85) => {
+	const edge = (pick: (b: Omit<Box, 'light'>) => number, axis: 'x' | 'y', side: -1 | 1) =>
+		glides(
+			t,
+			boxes.map((b, i) => {
+				if (i === 0) return {t: b.t, v: pick(b)};
+				const prev = boxes[i - 1];
+				const d = axis === 'x' ? b.cx - prev.cx : b.cy - prev.cy;
+				const leads = Math.abs(d) < 1 ? null : Math.sign(d) === side;
+				return {t: b.t, v: pick(b), d: leads === null ? (lead + trail) / 2 : leads ? lead : trail};
+			}),
+		);
+	const left = edge((b) => b.cx - b.w / 2, 'x', -1);
+	const right = edge((b) => b.cx + b.w / 2, 'x', 1);
+	const top = edge((b) => b.cy - b.h / 2, 'y', -1);
+	const bottom = edge((b) => b.cy + b.h / 2, 'y', 1);
+	const r = glides(t, boxes.map((b) => ({t: b.t, v: b.r})));
+	return {left, top, w: right - left, h: bottom - top, r, cx: (left + right) / 2, cy: (top + bottom) / 2};
+};
