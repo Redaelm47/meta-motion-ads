@@ -102,15 +102,7 @@ export const Aura: React.FC<{t: number; k: number}> = ({t, k}) => {
 	);
 };
 
-// ---------------------------------------------------------------- variant pieces (being tested)
-
-/** A short exposure flash, like a photo being taken. */
-export const Flash: React.FC<{t: number; at: number}> = ({t, at}) => {
-	const x = t - at;
-	if (x < 0 || x > 0.35) return null;
-	const k = x < 0.04 ? x / 0.04 : 1 - EASE(clamp01((x - 0.04) / 0.31));
-	return <div style={{position: 'absolute', inset: 0, background: WHITE, opacity: 0.55 * k}} />;
-};
+// ---------------------------------------------------------------- variant pieces (cinema, bubbles)
 
 /** Darkened edges that close in while the frame is frozen. */
 export const Vignette: React.FC<{k: number; strength?: number}> = ({k, strength = 0.55}) =>

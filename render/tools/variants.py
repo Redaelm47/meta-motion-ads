@@ -1,7 +1,7 @@
 """Quick drafts of the intro bridge, one per detail/sound variant, to compare side by side.
 
     python3 tools/variants.py            # all variants
-    python3 tools/variants.py photo      # just one
+    python3 tools/variants.py bubbles    # just one
 
 Each draft runs from the start to 1.5 s into the ad (half size, 25 fps, no motion blur), with the
 ad's own sound under its first seconds. Output: out/variants/<variant>.mp4
@@ -14,7 +14,7 @@ from pathlib import Path
 
 CHROME = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
 ROOT = Path(__file__).resolve().parent.parent
-NAMES = ["minimal", "photo", "freeze", "bubbles", "cinema"]
+NAMES = ["cinema", "bubbles"]
 FPS = 25
 
 

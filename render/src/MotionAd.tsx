@@ -2,7 +2,7 @@ import React from 'react';
 import {AbsoluteFill, Audio, Img, OffthreadVideo, Sequence, staticFile, useCurrentFrame, useVideoConfig} from 'remotion';
 import {AD, T, VIDEO, VOICE, WORDS} from './ad';
 import {EASE, QUICK, SOFT, Spring, clamp01, glide, glides, lerp, morphGlide, pulse, step} from './motion';
-import {Aura, Bokeh, Brackets, EdgeRing, Flash, Letterbox, PALETTE, RimLight, Ripple, Underline, Vignette} from './details';
+import {Aura, Bokeh, Brackets, EdgeRing, Letterbox, PALETTE, RimLight, Ripple, Underline, Vignette} from './details';
 import {Variant, sfxFor} from './variants';
 import {AD_YELLOW, Cursor, INK, Rise, WHITE, Word, fontFamily, glass} from './ui';
 
@@ -110,7 +110,7 @@ const Player: React.FC<{controls: number; progress: number; paused: boolean; pre
 
 // ---------------------------------------------------------------- the film
 
-export const MotionAd: React.FC<{variant?: Variant}> = ({variant = 'minimal'}) => {
+export const MotionAd: React.FC<{variant?: Variant}> = ({variant = 'cinema'}) => {
 	const frame = useCurrentFrame();
 	const {fps} = useVideoConfig();
 	const t = frame / fps;
@@ -119,8 +119,7 @@ export const MotionAd: React.FC<{variant?: Variant}> = ({variant = 'minimal'}) =
 	// Camera on the frozen frame: in when it pauses, out once we are back from the ad.
 	const k = pulse(t, T.freeze, T.settle, ZOOM_IN, ZOOM_OUT);
 	const drift = 1 + 0.015 * Math.max(0, Math.min(t, T.flood) - T.freeze) * k;
-	const punch = variant === 'freeze' && t > T.freeze ? 0.06 * Math.exp(-(t - T.freeze) * 7) * Math.min(1, (t - T.freeze) / 0.04) : 0;
-	const s = lerp(1, VIDEO.zoom, k) * drift * (1 + punch);
+	const s = lerp(1, VIDEO.zoom, k) * drift;
 	const fx = lerp(W / 2, VIDEO.subject.x, k);
 	const fy = lerp(H / 2, VIDEO.subject.y, k);
 	const ax = lerp(W / 2, VIDEO.anchor.x, k);
@@ -194,7 +193,7 @@ export const MotionAd: React.FC<{variant?: Variant}> = ({variant = 'minimal'}) =
 				</Sequence>
 				{paused && (
 					<>
-						<Img src={staticFile(VIDEO.freeze)} style={{position: 'absolute', width: W, height: H, filter: `brightness(${1 - 0.42 * dim}) saturate(${1 - (variant === 'freeze' ? 0.6 : 0.3) * dim}) blur(${4 * dim}px)`}} />
+						<Img src={staticFile(VIDEO.freeze)} style={{position: 'absolute', width: W, height: H, filter: `brightness(${1 - 0.42 * dim}) saturate(${1 - 0.3 * dim}) blur(${4 * dim}px)`}} />
 						<Img
 							src={staticFile(VIDEO.person)}
 							style={{
@@ -214,10 +213,9 @@ export const MotionAd: React.FC<{variant?: Variant}> = ({variant = 'minimal'}) =
 				</Sequence>
 			</AbsoluteFill>
 
-			{(variant === 'freeze' || variant === 'cinema') && paused && t < T.adStart && <Vignette k={dim} strength={variant === 'freeze' ? 0.6 : 0.45} />}
-			{variant === 'cinema' && <Letterbox k={glide(t, T.freeze, 0.5) - glide(t, T.flood, 0.4)} />}
+			{variant === 'cinema' && paused && (t < T.adStart || t >= T.contract) && <Vignette k={dim} strength={0.45} />}
+			{variant === 'cinema' && <Letterbox k={glide(t, T.freeze, 0.5) - glide(t, T.flood, 0.4) + glide(t, T.contract, 0.4) - glide(t, T.resume, 0.5)} />}
 			{variant === 'bubbles' && paused && t < T.adStart && <Bokeh t={t} k={glide(t, T.ok - 0.3, 0.8)} />}
-			{variant === 'photo' && <Flash t={t} at={T.freeze} />}
 
 			{/* Glass caption pill */}
 			{paused && t > T.ok - 0.3 && t < T.adStart && (
