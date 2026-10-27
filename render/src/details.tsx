@@ -1,10 +1,13 @@
-// Motion-design details layered on the bridges: lock-on brackets, an orbit around the subject,
-// a callout line, ripples, a travelling rim light. Scene-space pieces live inside the camera
+// Motion-design details layered on the bridges: lock-on brackets, the subject's outline, an aura
+// in the ad's own colours, ripples, a travelling rim light. Scene-space pieces live inside the camera
 // transform and divide their stroke by the camera scale so lines keep the same width on screen.
 
 import React from 'react';
 import {EASE, clamp01, glide, step} from './motion';
-import {LIME, WHITE} from './ui';
+import {WHITE} from './ui';
+
+// The incoming ad's palette (sampled from its gradient scene), so our bridge already looks like it.
+export const PALETTE = {cream: '#fcf9f6', orange: '#f8a670', peach: '#f3bb90', rose: '#e4b7ac', lilac: '#d7c7c9', ink: '#343434', deep: '#ef8a55'};
 
 const draw = (k: number): React.SVGProps<SVGPathElement> => ({pathLength: 1, strokeDasharray: 1, strokeDashoffset: 1 - clamp01(k)});
 
@@ -33,47 +36,6 @@ export const Brackets: React.FC<{t: number; box: {x0: number; y0: number; x1: nu
 	);
 };
 
-type Orbit = {cx: number; cy: number; rx: number; ry: number; rot: number};
-const onOrbit = (o: Orbit, a: number) => {
-	const r = (o.rot * Math.PI) / 180;
-	const x = o.rx * Math.cos(a);
-	const y = o.ry * Math.sin(a);
-	return {x: o.cx + x * Math.cos(r) - y * Math.sin(r), y: o.cy + x * Math.sin(r) + y * Math.cos(r), behind: Math.sin(a) < 0};
-};
-
-/** A thin orbit around the subject. Render the "back" half under the cutout and the "front" half over it. */
-export const OrbitHalf: React.FC<{t: number; orbit: Orbit; half: 'back' | 'front'; at: number; out: number; scale: number}> = ({t, orbit, half, at, out, scale}) => {
-	const k = glide(t, at, 0.8) - glide(t, out, 0.35);
-	if (k <= 0.001) return null;
-	const a = onOrbit(orbit, Math.PI);
-	const b = onOrbit(orbit, 0);
-	const d = half === 'back'
-		? `M${a.x} ${a.y} A${orbit.rx} ${orbit.ry} ${orbit.rot} 0 1 ${b.x} ${b.y}`
-		: `M${b.x} ${b.y} A${orbit.rx} ${orbit.ry} ${orbit.rot} 0 1 ${a.x} ${a.y}`;
-	const dot = onOrbit(orbit, Math.PI * 0.75 + (t - at) * 2.4);
-	const showDot = dot.behind === (half === 'back');
-	return (
-		<svg width={1920} height={1080} style={{position: 'absolute', inset: 0, overflow: 'visible'}}>
-			<path d={d} fill="none" stroke={WHITE} strokeOpacity={0.85} strokeWidth={2.5 / scale} strokeLinecap="round" {...draw(k)} />
-			{showDot && <circle cx={dot.x} cy={dot.y} r={(7 / scale) * clamp01(k * 2)} fill={LIME} />}
-		</svg>
-	);
-};
-
-/** A callout line from a point on the subject to the caption, with a dot at the subject's end. */
-export const Callout: React.FC<{t: number; from: {x: number; y: number}; to: {x: number; y: number}; at: number; out: number}> = ({t, from, to, at, out}) => {
-	const k = glide(t, at, 0.5);
-	const o = glide(t, out, 0.3);
-	if (k <= 0.001 || o >= 0.999) return null;
-	return (
-		<svg width={1920} height={1080} style={{position: 'absolute', inset: 0}}>
-			<path d={`M${from.x} ${from.y} L${to.x} ${to.y}`} fill="none" stroke={WHITE} strokeOpacity={0.8} strokeWidth={2} strokeLinecap="round" pathLength={1} strokeDasharray={1} strokeDashoffset={1 - k + o} />
-			<circle cx={from.x} cy={from.y} r={6 * step(t - at, {response: 0.35, damping: 0.7}) * (1 - o)} fill={LIME} />
-			<circle cx={from.x} cy={from.y} r={6 + 14 * clamp01((t - at) / 0.6)} fill="none" stroke={LIME} strokeWidth={2} strokeOpacity={(1 - clamp01((t - at) / 0.6)) * (1 - o)} />
-		</svg>
-	);
-};
-
 /** Two rings that spread from a click. */
 export const Ripple: React.FC<{t: number; at: number; x: number; y: number}> = ({t, at, x, y}) => {
 	if (t < at || t > at + 0.8) return null;
@@ -88,14 +50,14 @@ export const Ripple: React.FC<{t: number; at: number; x: number; y: number}> = (
 };
 
 /** A highlight that travels around the edge of a rounded shape. */
-export const RimLight: React.FC<{t: number; radius: number; color?: string; width?: number}> = ({t, radius, color = WHITE, width = 2}) => (
+export const RimLight: React.FC<{t: number; radius: number; colors?: [string, string]; width?: number}> = ({t, radius, colors = [PALETTE.peach, PALETTE.lilac], width = 2}) => (
 	<div
 		style={{
 			position: 'absolute',
 			inset: 0,
 			borderRadius: radius,
 			padding: width,
-			background: `conic-gradient(from ${t * 140}deg, transparent 0deg, ${color} 50deg, transparent 110deg, transparent 180deg, ${LIME} 230deg, transparent 290deg)`,
+			background: `conic-gradient(from ${t * 140}deg, transparent 0deg, ${colors[0]} 50deg, transparent 110deg, transparent 180deg, ${colors[1]} 230deg, transparent 290deg)`,
 			WebkitMask: 'linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0)',
 			WebkitMaskComposite: 'xor',
 			maskComposite: 'exclude',
@@ -105,16 +67,89 @@ export const RimLight: React.FC<{t: number; radius: number; color?: string; widt
 );
 
 /** A hand-drawn underline that draws itself under a word. */
-export const Underline: React.FC<{t: number; at: number}> = ({t, at}) => (
+export const Underline: React.FC<{t: number; at: number; color?: string}> = ({t, at, color = PALETTE.orange}) => (
 	<svg viewBox="0 0 100 14" preserveAspectRatio="none" style={{position: 'absolute', left: '-2%', width: '104%', bottom: '-0.12em', height: '0.3em', overflow: 'visible'}}>
-		<path d="M2 9 C 25 3, 55 12, 98 5" fill="none" stroke={LIME} strokeWidth={4} strokeLinecap="round" vectorEffect="non-scaling-stroke" {...draw(glide(t, at, 0.45))} />
+		<path d="M2 9 C 25 3, 55 12, 98 5" fill="none" stroke={color} strokeWidth={3.5} strokeLinecap="round" {...draw(glide(t, at, 0.45))} />
 	</svg>
 );
 
 /** A ring riding just outside a growing or shrinking circle (the flood's edge). */
-export const EdgeRing: React.FC<{x: number; y: number; r: number; k: number}> = ({x, y, r, k}) =>
+export const EdgeRing: React.FC<{x: number; y: number; r: number; k: number; color?: string}> = ({x, y, r, k, color = PALETTE.orange}) =>
 	k > 0.02 && k < 0.98 ? (
 		<svg width={1920} height={1080} style={{position: 'absolute', inset: 0}}>
-			<circle cx={x} cy={y} r={r + 18} fill="none" stroke={LIME} strokeWidth={4} strokeOpacity={Math.sin(Math.PI * k)} />
+			<circle cx={x} cy={y} r={r + 18} fill="none" stroke={color} strokeWidth={4} strokeOpacity={Math.sin(Math.PI * k)} />
 		</svg>
 	) : null;
+
+/**
+ * A thick white outline that goes around the subject: it starts at the top of the head, two
+ * strokes run down both sides with a bright tip each and meet at the feet. Thick on purpose, it
+ * covers the small errors of the cutout's edge; the warm glow stays faint. Then a short segment in
+ * the ad's orange keeps running around it.
+ */
+// Drawn in screen space with the camera's transform on the path: an SVG filter inside the zoomed
+// layer makes Chrome rasterise that whole layer at low resolution.
+export const SubjectOutline: React.FC<{
+	t: number;
+	d: string;
+	pts: number[][];
+	at: number;
+	out: number;
+	camera: {tx: number; ty: number; s: number};
+	origin: {x: number; y: number};
+	grow: number;
+}> = ({t, d, pts, at, out, camera, origin, grow}) => {
+	const k = clamp01(glide(t, at, 1.15));
+	const gone = glide(t, out, 0.35);
+	if (k <= 0.001 || gone >= 0.999) return null;
+	const scale = camera.s * grow;
+	const u = (v: number) => v / scale;
+	const half = k / 2;
+	const dash = {pathLength: 1, strokeDasharray: `${half} ${Math.max(0, 1 - k)} ${half} 0`};
+	const tip = (f: number) => pts[Math.min(pts.length - 1, Math.floor(((f % 1) + 1) % 1 * pts.length))];
+	const tips = k > 0.01 && k < 0.995 ? [tip(half), tip(1 - half)] : [];
+	const run = ((t - at - 1.15) * 0.4) % 1;
+	return (
+		<svg width={1920} height={1080} style={{position: 'absolute', inset: 0, overflow: 'visible', opacity: 1 - gone}}>
+			<defs>
+				<filter id="outline-glow" x="-20%" y="-20%" width="140%" height="140%">
+					<feGaussianBlur stdDeviation={u(6)} />
+				</filter>
+			</defs>
+			<g transform={`translate(${camera.tx} ${camera.ty}) scale(${camera.s}) translate(${origin.x} ${origin.y}) scale(${grow}) translate(${-origin.x} ${-origin.y})`}>
+				<path d={d} fill="none" stroke={PALETTE.deep} strokeWidth={u(22)} strokeLinejoin="round" filter="url(#outline-glow)" opacity={0.35} {...dash} />
+				<path d={d} fill="none" stroke={WHITE} strokeWidth={u(13)} strokeLinejoin="round" strokeLinecap="round" {...dash} />
+				{tips.map(([x, y], i) => (
+					<g key={i}>
+						<circle cx={x} cy={y} r={u(16)} fill={PALETTE.deep} opacity={0.5} filter="url(#outline-glow)" />
+						<circle cx={x} cy={y} r={u(8.5)} fill={WHITE} />
+					</g>
+				))}
+				{k >= 0.995 && t > at + 1.15 && (
+					<path d={d} fill="none" stroke={PALETTE.deep} strokeWidth={u(13)} strokeLinecap="round" pathLength={1} strokeDasharray="0.08 0.92" strokeDashoffset={-run} />
+				)}
+			</g>
+		</svg>
+	);
+};
+
+/** The ad's moving gradient (orange, peach, lilac), tinting a glass shape from the inside. */
+export const Aura: React.FC<{t: number; k: number}> = ({t, k}) => {
+	if (k <= 0.001) return null;
+	const p = (ph: number, ax: number) => 50 + ax * Math.sin(t * 0.9 + ph);
+	return (
+		<div
+			style={{
+				position: 'absolute',
+				inset: '-20%',
+				opacity: k,
+				filter: 'blur(16px)',
+				background: [
+					`radial-gradient(circle at ${p(0, 30)}% ${p(1.3, 25)}%, ${PALETTE.deep} 0%, transparent 42%)`,
+					`radial-gradient(circle at ${p(2.1, 35)}% ${p(0.4, 30)}%, ${PALETTE.lilac} 0%, transparent 50%)`,
+					`radial-gradient(circle at ${p(4.0, 25)}% ${p(2.7, 20)}%, ${PALETTE.peach} 0%, transparent 48%)`,
+				].join(', '),
+			}}
+		/>
+	);
+};

@@ -52,7 +52,7 @@ def main():
     def render_part(name, first, last):
         run(["npx", "remotion", "render", "src/index.ts", "MotionAd", PARTS / f"{name}.mp4",
              f"--props={json.dumps({'fps': fps * sub})}", f"--frames={first * sub}-{last * sub - 1}",
-             f"--scale={scale}", "--concurrency=8", "--crf=18", "--log=error", f"--browser-executable={CHROME}"])
+             f"--scale={scale}", "--concurrency=8", "--crf=18", "--gl=angle", "--log=error", f"--browser-executable={CHROME}"])
 
     bridge("intro", 0, a)
     bridge("outro", b, total)

@@ -1,9 +1,11 @@
 import React from 'react';
 import {AbsoluteFill, Audio, Img, OffthreadVideo, Sequence, staticFile, useCurrentFrame, useVideoConfig} from 'remotion';
 import {AD, T, VIDEO, VOICE, WORDS} from './ad';
+import {SunShader} from './SunShader';
 import {EASE, QUICK, SOFT, Spring, clamp01, glide, glides, lerp, morphGlide, pulse, step} from './motion';
-import {Brackets, Callout, EdgeRing, OrbitHalf, RimLight, Ripple, Underline} from './details';
-import {AD_YELLOW, Cursor, INK, LIME, Rise, WHITE, Word, fontFamily, glass} from './ui';
+import {Aura, Brackets, EdgeRing, PALETTE, RimLight, Ripple, SubjectOutline, Underline} from './details';
+import outline from '../public/demo/person_outline.json';
+import {AD_YELLOW, Cursor, INK, Rise, WHITE, Word, fontFamily, glass} from './ui';
 
 const W = 1920;
 const H = 1080;
@@ -15,10 +17,10 @@ const YT_RED = '#ff0033';
 
 const PLAY_BTN = {x: 62, y: 1046}; // the player's play / pause button
 const BIRTH = {x: 960, y: 700}; // the subject's hand on screen, where the caption pill is born
-// Subject in source-frame coordinates: lock-on box, orbit around the body, head for the callout.
-const SUBJECT_BOX = {x0: 890, y0: 385, x1: 1330, y1: 750};
-const ORBIT = {cx: 1111, cy: 600, rx: 250, ry: 62, rot: -10};
-const HEAD = {x: 995, y: 455};
+// Subject in source-frame coordinates, for the lock-on brackets.
+const SUBJECT_BOX = {x0: 930, y0: 385, x1: 1330, y1: 745};
+// The ad's sun, behind the subject (source-frame coordinates).
+const SUN = {x: 1125, y: 535, r: 240};
 const PILL = {left: 1040, cy: 400, wOk: 250, w1: 650, h1: 116, h2: 176, wYou: 380, h: 116, pad: 46, font: 52, line: 62};
 // "You" inside the pill: the ad's own artwork, at text size.
 const YOU_H = 62;
@@ -150,6 +152,7 @@ export const MotionAd: React.FC = () => {
 		{t: T.andyou - 0.1, cx: PILL.left + PILL.wYou / 2, cy: PILL.cy, w: PILL.wYou, h: PILL.h, r: PILL.h / 2},
 	], 0.42, 0.6);
 	const pillIn = step(t - (T.ok - 0.3), POP);
+	pill.r = Math.min(pill.w, pill.h, PILL.h) / 2; // always fully rounded, never a square in between
 	const twoLines = glide(t, T.isnthe - 0.1, 0.6);
 
 	// The ad's own "You" flies from the pill to where the ad's first frame has it.
@@ -207,7 +210,11 @@ export const MotionAd: React.FC = () => {
 				{paused && (
 					<>
 						<Img src={staticFile(VIDEO.freeze)} style={{position: 'absolute', width: W, height: H, filter: `brightness(${1 - 0.42 * dim}) saturate(${1 - 0.3 * dim}) blur(${4 * dim}px)`}} />
-						<OrbitHalf t={t} orbit={ORBIT} half="back" at={T.ok - 0.15} out={T.flood} scale={s} />
+						{t > T.ok - 0.05 && t < T.adStart && (
+							<div style={{position: 'absolute', left: SUN.x - SUN.r, top: SUN.y - SUN.r, width: 2 * SUN.r, height: 2 * SUN.r, clipPath: `circle(${SUN.r * Math.sqrt(glide(t, T.ok - 0.05, 0.8))}px at 50% 50%)`}}>
+								<SunShader time={t} size={2 * SUN.r} />
+							</div>
+						)}
 						<Img
 							src={staticFile(VIDEO.person)}
 							style={{
@@ -219,7 +226,6 @@ export const MotionAd: React.FC = () => {
 								filter: `drop-shadow(0 ${18 * dim}px ${26 * dim}px rgba(0,0,0,${0.45 * dim}))`,
 							}}
 						/>
-						<OrbitHalf t={t} orbit={ORBIT} half="front" at={T.ok - 0.15} out={T.flood} scale={s} />
 						<Brackets t={t} box={SUBJECT_BOX} at={T.freeze + 0.12} out={T.ok - 0.1} scale={s} />
 					</>
 				)}
@@ -228,11 +234,12 @@ export const MotionAd: React.FC = () => {
 				</Sequence>
 			</AbsoluteFill>
 
-			<Callout t={t} from={{x: (HEAD.x - fx) * s + ax, y: (HEAD.y - fy) * s + ay}} to={{x: pill.left + 4, y: pill.top + pill.h / 2}} at={T.ok - 0.05} out={T.andyou - 0.15} />
+			{paused && <SubjectOutline t={t} d={outline.d} pts={outline.pts} at={T.ok - 0.2} out={T.flood} camera={{tx: ax - fx * s, ty: ay - fy * s, s}} origin={VIDEO.subject} grow={1 + 0.025 * dim} />}
 
 			{/* Glass caption pill */}
 			{paused && t > T.ok - 0.3 && t < T.adStart && (
 				<div style={{position: 'absolute', left: pill.left, top: pill.top, width: pill.w, height: pill.h, borderRadius: pill.r, ...glass(false), transform: `scale(${pillIn})`, overflow: 'hidden'}}>
+					<Aura t={t} k={0.35 * glide(t, T.ok - 0.2, 0.8) + 0.35 * glide(t, T.andyou - 0.2, 0.6)} />
 					<RimLight t={t} radius={pill.r} />
 					{/* "Okay." */}
 					<div style={{position: 'absolute', left: PILL.left - pill.left, top: PILL.cy - PILL.h / 2 - pill.top, width: PILL.wOk, height: PILL.h, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily, fontWeight: 600, fontSize: PILL.font, letterSpacing: '-0.03em', color: WHITE, textShadow: '0 1px 12px rgba(0,0,0,0.18)'}}>
@@ -265,7 +272,7 @@ export const MotionAd: React.FC = () => {
 					{t >= T.adEnd && <Img src={staticFile('ad/last.png')} style={{position: 'absolute', width: W, height: H}} />}
 					{t >= T.adEnd && (
 						<div style={{position: 'absolute', left: back.left, top: back.top, width: back.w, height: back.h, borderRadius: back.r, background: INK, overflow: 'hidden', transform: `scale(${backIn})`, boxShadow: '0 16px 40px rgba(0,0,0,0.18)'}}>
-							<RimLight t={t} radius={back.r} color={LIME} />
+							<RimLight t={t} radius={back.r} colors={[PALETTE.orange, PALETTE.lilac]} />
 							<div style={{position: 'absolute', left: 40, top: 0, height: 92, display: 'flex', alignItems: 'center', fontFamily, fontWeight: 600, fontSize: 40, letterSpacing: '-0.02em', color: WHITE, whiteSpace: 'pre'}}>
 								<Lines t={t} lines={[[...WORDS.alright, ...WORDS.where]]} />
 							</div>
